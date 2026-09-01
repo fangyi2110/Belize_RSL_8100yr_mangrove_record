@@ -29,7 +29,7 @@ library(lubridate)
 library(pastecs)
 library(hdrcde) # to compute highest density region
 library(ggridges)
-library
+
 ```
 
 # Core elevation
@@ -139,7 +139,7 @@ p = ggplot() +
 
 p
 
-ggsave('figures/Belize LL comparison.pdf',p,height=3,width=8)
+ggsave('figures/tides/Belize LL comparison.pdf',p,height=3,width=8)
 ```
 
 ## Aligning Carrie Bow Cay Tide Gauge data to Twin Cays
@@ -274,7 +274,7 @@ p_aft = ggplot() +
 p= cowplot::plot_grid(p_bef,p_aft,align='hv',nrow=2)
 p
 
-ggsave('figures/CBC_alignedto_TWC_withOSU.pdf',p,height=8,width=8)
+ggsave('figures/tides/CBC_alignedto_TWC_withOSU.pdf',p,height=8,width=8)
 
 # Cut to two years of data for training UTide model
 CBC_tidegauge_radar_2016_2017_2018 = filter(CBC_tidegauge_radar,CBC_tidegauge_radar$`Time (UTC)`<ymd('2018/04/29'))
@@ -401,7 +401,7 @@ plot_OSU_UTide_compare = cowplot::plot_grid(plota,plotb,plotc,
                                             ncol=1)
 plot_OSU_UTide_compare
 
-ggsave('figures/OSU_UTide_ATT_comparison.pdf',plot_OSU_UTide_compare,height=10,width=10)
+ggsave('figures/tides/OSU_UTide_ATT_comparison.pdf',plot_OSU_UTide_compare,height=10,width=10)
 
 # export ATT Tides used for comparison
 ATT_CBC_tgcompare_cleaned = select(ATT_CBC_tgcompare,'height':'type')
@@ -438,16 +438,16 @@ Elevation surveys at each site were done using a digital level to a temporary be
 ```{r indicative meaning of peat-forming mangroves, warning=FALSE, fig.width=9,fig.height=4}
 
 # load modern surveys of peat-forming mangroves (orthometric heights)
-modernsurvey = readxl::read_xlsx('data/BelizeNotesConsolidated_21Apr21.xlsx',sheet=2,skip=1)
+modernsurvey = readxl::read_xlsx('data/field_notes/BelizeNotesConsolidated_21Apr21.xlsx',sheet=2,skip=1)
 modernsurvey = pivot_longer(modernsurvey,cols=Grover:CookieMonster,names_to='Site',values_to='values')
 
-# load MTL and HAT from UTide model Carrie Bow Cay
-load('data/CBC_UTidedatums.Rdata')
+# load MTL and HAT from UTide model Carrie Bow Cay 
+load('data/tides/CBC_UTidedatums.Rdata')
 
 # convert and tidal datums to be relative to MSL by subtracting ortho height of MSL
 modernsurvey=modernsurvey %>% mutate(values_MSL=values-filter(UTide_datums,datum=='MSL')$ortho_level)
 UTide_datums=UTide_datums %>% mutate(level_MSL=ortho_level-filter(UTide_datums,datum=='MSL')$ortho_level)
-write.csv(file='Results/UTide_datums_TwinCays.csv',UTide_datums)
+write.csv(file='Results/tides/UTide_datums_TwinCays.csv',UTide_datums)
 
 # calculate RWL and IR
 modernsurvey = drop_na(modernsurvey) # remove na values MS
@@ -457,33 +457,31 @@ hdr_IM_upr=hdr_IM$hdr[,2] # lower limit of 95% HDR
 unforced_RWL=(hdr_IM_upr+hdr_IM_lwr)/2 # RWL
 unforced_IR=(hdr_IM_upr-hdr_IM_lwr) # 2 sigma range 
 
-# plot IM 
-p_IM = ggplot(data=modernsurvey) + 
-  # density plot
-  geom_density(aes(x=values_MSL,fill=Site,y=..scaled..),alpha=0.7,na.rm=TRUE,bw=0.015) + 
-  # plot tidal datums
-  geom_vline(aes(xintercept=filter(UTide_datums,datum=='LAT')$level_MSL),linetype='dashed') +
-  geom_vline(aes(xintercept=filter(UTide_datums,datum=='MLWS')$level_MSL),linetype='dashed') +
-  geom_vline(aes(xintercept=filter(UTide_datums,datum=='MTL')$level_MSL),linetype='dashed') +
-  geom_vline(aes(xintercept=filter(UTide_datums,datum=='HAT')$level_MSL),linetype='dashed') +
-  geom_text(aes(x=filter(UTide_datums,datum=='LAT')$level_MSL-0.03,y=1.0,label='LAT')) +
-  geom_text(aes(x=filter(UTide_datums,datum=='MLWS')$level_MSL-0.03,y=1.0,label='MLWS')) +
-  geom_text(aes(x=filter(UTide_datums,datum=='MTL')$level_MSL-0.03,y=1.0,label='MTL')) +
-  geom_text(aes(x=filter(UTide_datums,datum=='HAT')$level_MSL+0.03,y=1.0,label='HAT')) +
-  # plot indicative meaning
-  geom_segment(aes(x=hdr_IM_lwr,xend=hdr_IM_upr,y=-0.05,yend=-0.05),linewidth=2)+
-  theme_classic() +
-  scale_fill_brewer(palette='Paired',direction=1) +
-  labs(y='Density',x='Elevation (m msl)')
+# calculate density for plotting
+IM_density = density(
+  modernsurvey$values_MSL,
+  na.rm = TRUE,
+  bw = 0.015
+)
 
-p_IM
-
-ggsave('figures/Indicative range density plots raw.pdf',p_IM,height=4,width=7)
-
+IM_density_df = data.frame(
+  x = IM_density$x,
+  y = IM_density$y / max(IM_density$y)  
+)
 
 p_IM_all = ggplot(data=modernsurvey) + 
   # density plot
   geom_density(aes(x=values_MSL,y=..scaled..),alpha=0.7,na.rm=TRUE,bw=0.015) + 
+  # Shade indicative meaning
+  geom_area(
+    data = subset(
+      IM_density_df,
+      x >= hdr_IM_lwr & x <= hdr_IM_upr
+    ),
+    aes(x = x, y = y),
+    fill = "steelblue",
+    alpha = 0.4
+  ) +
   # plot tidal datums
   geom_vline(aes(xintercept=filter(UTide_datums,datum=='LAT')$level_MSL),linetype='dashed') +
   geom_vline(aes(xintercept=filter(UTide_datums,datum=='MLWS')$level_MSL),linetype='dashed') +
@@ -493,15 +491,13 @@ p_IM_all = ggplot(data=modernsurvey) +
   geom_text(aes(x=filter(UTide_datums,datum=='MLWS')$level_MSL-0.03,y=1.0,label='MLWS')) +
   geom_text(aes(x=filter(UTide_datums,datum=='MTL')$level_MSL-0.03,y=1.0,label='MTL')) +
   geom_text(aes(x=filter(UTide_datums,datum=='HAT')$level_MSL+0.03,y=1.0,label='HAT')) +
-  # plot indicative meaning
-  geom_segment(aes(x=hdr_IM_lwr,xend=hdr_IM_upr,y=-0.05,yend=-0.05),linewidth=2)+
   theme_classic() +
   scale_fill_brewer(palette='Paired',direction=1) +
   labs(y='Density',x='Elevation (m msl)')
 
 p_IM_all
 
-ggsave('figures/Indicative range density plots raw allsitescombined.pdf',p_IM_all,height=4,width=7)
+ggsave('figures/indicative_meaning/Twin Cays Indicative range density plot.pdf',p_IM_all,height=4,width=7)
 
 
 paste('The indicative meaning of peat-forming mangroves in our study is',round(unforced_RWL,digits=2),'+/-',round(unforced_IR/2,digits=2),'m msl.')
@@ -516,12 +512,12 @@ We modelled sediment compaction using the geotechnical model of Brain et al. (20
 ```{r load decompaction data}
 
 # load measured loss-on-ignition and dry bulk density data
-LOI=readxl::read_xlsx('data/decompaction modelling/Decompaction_Belizemodern_normal.xlsx',sheet=1)
+LOI=readxl::read_xlsx('data/decompaction_modelling/Decompaction_Belizemodern_normal.xlsx',sheet=1)
 
 # load decompaction model results
-DryDensity=readxl::read_xlsx('data/decompaction modelling/Decompaction_Belizemodern_normal.xlsx',sheet=2)
-EffStress=readxl::read_xlsx('data/decompaction modelling/Decompaction_Belizemodern_normal.xlsx',sheet=3)
-PDL=readxl::read_xlsx('data/decompaction modelling/Decompaction_Belizemodern_normal.xlsx',sheet=4) %>% rename(depth=Depth) 
+DryDensity=readxl::read_xlsx('data/decompaction_modelling/Decompaction_Belizemodern_normal.xlsx',sheet=2)
+EffStress=readxl::read_xlsx('data/decompaction_modelling/Decompaction_Belizemodern_normal.xlsx',sheet=3)
+PDL=readxl::read_xlsx('data/decompaction_modelling/Decompaction_Belizemodern_normal.xlsx',sheet=4) %>% rename(depth=Depth) 
 
 # maximum post-depositional lowering
 maxPDL=filter(PDL,PDL==max(PDL))
@@ -533,67 +529,6 @@ paste('LOI ranges between',round(min(LOIpeat$`measured LOI`),digits=0),'and',rou
 
 LOImud = filter(LOI,`measured depth`>=11.7)
 paste('LOI of the underlying mud is <=',round(max(LOImud$`measured LOI`),digits=0),'.')
-```
-
-
-```{r decompaction model validation, fig.width=8,fig.height=6, message=FALSE}
-
-# Interpolate measured values to the same depths as the modelled values
-interpolated = approx(x=DryDensity$`measured depth`,
-                      y=DryDensity$`measured density`,
-                      xout=DryDensity$`modelled depth`)
-DryDensity = DryDensity %>% mutate(measured_density_interpolated=interpolated[[2]]) %>% na.omit # remove all na values
-
-# Fit linear model
-x = DryDensity$measured_density_interpolated
-y = DryDensity$`modelled mean density`
-model = lm(y~x)
-model_summary=summary(model)
-
-# adjusted r-squared (accounts for overfitting)
-r_adj = model_summary$adj.r.squared
-
-# p-value
-f_stat = model_summary$fstatistic
-f_pval = pf(f_stat[1], f_stat[2], f_stat[3], lower.tail = FALSE)
-threshold=0.0001
-if (f_pval < threshold) {
-  pval = paste0("F-test p-value: < ", sprintf("%.4f", 0.0001))
-} else {
-  pval = paste0("F-test p-value: ", format(round(f_pval, 4), nsmall = 4))
-}
-
-# predict model
-modelpred=predict.lm(model,se.fit=TRUE)
-DryDensity_fitted = data.frame(x=x,y=modelpred$fit,y_sd=modelpred$se.fit) 
-
-# plot correlation
-pcorr=ggplot()+
-  geom_errorbar(data=DryDensity,aes(x=measured_density_interpolated,
-                                    ymin=`modelled mean density`-`modelled density sd`,
-                                    ymax=`modelled mean density`+`modelled density sd`),color='#1FAAFF',linewidth=0.5,alpha=0.5) +
-  geom_point(data=DryDensity, aes(x=measured_density_interpolated,y=`modelled mean density`),color='#1FAAFF')+
-  
-  geom_path(data=DryDensity_fitted,aes(x=x,y=y)) +
-  geom_ribbon(data=DryDensity_fitted,
-              aes(x=x,
-                  ymin=y-y_sd,
-                  ymax=y+y_sd),alpha=0.5,fill='grey50',color='transparent') +
-  geom_text(aes(x = 0.215, y = 1,
-            label = paste0('R-squared (adjusted) = ', round(r_adj,digits=2))),
-            size=5) +
-  geom_text(aes(x = 0.19, y = 0.95,
-            label = pval),
-            size=5) +
-  scale_x_continuous(limits=c(0.05,1))+
-  scale_y_continuous(limits=c(0.05,1))+
-  theme_classic() +
-  theme(axis.text=element_text(size=12),
-        axis.title=element_text(size=12,face='bold'))+
-  labs(x='Measured dry density (g/cc)',y='Modelled density (g/cc)')
-pcorr
-
-ggsave('figures/decompaction_model_validation_Belizemodern.pdf',pcorr,height=5,width=8)
 ```
 
 
@@ -725,7 +660,7 @@ plot=cowplot::plot_grid(p_strat,LOIPlot,DryDensityPlot,EffStressPlot,PDLPlot,
 
 plot
 
-ggsave('figures/PDL Belize modern.pdf',plot,height=5.5,width=14.5)
+ggsave('figures/lithostratigraphy/PDL Belize modern.pdf',plot,height=5.5,width=14.5)
 
 
 ```
