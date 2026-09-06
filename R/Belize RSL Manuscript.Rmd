@@ -29,6 +29,7 @@ library(lubridate)
 library(pastecs)
 library(hdrcde) # to compute highest density region
 library(ggridges)
+library(Bchron)
 
 ```
 
@@ -715,10 +716,10 @@ tidyC14results = function(x) {
 ```{r load lab reported conventional ages, message=FALSE}
 
 # dates sent off on 30 September 2019
-dates_30Sep2019 = tidyC14results('data/C14 dates/Belize C14 results 30Sep2019 IntCal13.xlsx')
+dates_30Sep2019 = tidyC14results('data/geochronology/C14_dates/Belize C14 results 30Sep2019 IntCal13.xlsx')
 
 # dates sent off on in 2021
-dates_2021 = readxl::read_xlsx('data/C14 dates/Belize C14 results 2021 IntCal20.xlsx',sheet=2) %>% select(labID:Pretreatment)
+dates_2021 = readxl::read_xlsx('data/geochronology/C14_dates/Belize C14 results 2021 IntCal20.xlsx',sheet=2) %>% select(labID:Pretreatment)
 
 # bind all dates
 dates = rbind(dates_30Sep2019,
@@ -738,12 +739,7 @@ modern=data.frame(age = -69, # 2019 CE = -69 BP
 dates=bind_rows(modern,dates)
 
 # export dates as .csv for keying into manuscript 
-write_csv(dates,file='results/dating results consolidated.csv')
-
-# export dates for input to Bacon age-depth model
-baconinput = select(dates,c('labID','age','sd','Depth')) 
-baconinput = baconinput%>% rename(error=sd,depth=Depth) %>% mutate(cc=c(0,rep(1,nrow(baconinput)-1)))
-write_csv(baconinput,file='Bacon_runs/GR19C1/GR19C1.csv')
+write_csv(dates,file='results/geochronology/C14 dating results consolidated.csv')
 
 ```
 
@@ -798,7 +794,7 @@ paste('The 2-sigma spread in fine fraction ages at any given depth ranges from',
 ```{r age-depth model FF vs macros}
 
 # load all dates 
-dates=read.csv('results/dating results consolidated.csv')
+dates=read.csv('results/geochronology/C14 dating results consolidated.csv')
 
 ############################### UNCOMMENT TO RE-RUN AGE-DEPTH MODELS #########################
  
@@ -837,14 +833,14 @@ dates=read.csv('results/dating results consolidated.csv')
 #                              positionThicknesses = Thickness,
 #                              ids = labID,
 #                              predictPositions = PDL$depth*100))
-# # save(age_depth,file='results/age-depth model outputs/age-depth_alldata.Rdata')
+# # save(age_depth,file='results/geochronology/age-depth model outputs/age-depth_alldata.Rdata')
 
 #########################################################################################
 
 # load age-depth model outputs
-load('results/age-depth model outputs/age-depth_macros_only.Rdata')
-load('results/age-depth model outputs/age-depth_FF_only.Rdata')
-load('results/age-depth model outputs/age-depth_alldata.Rdata')
+load('results/geochronology/age-depth model outputs/age-depth_macros_only.Rdata')
+load('results/geochronology/age-depth model outputs/age-depth_FF_only.Rdata')
+load('results/geochronology/age-depth model outputs/age-depth_alldata.Rdata')
 
 # calibrate all ages for plotting 
 calib_dates_modelled = with(slice(dates,2:nrow(dates)), # exclude core top (first row)
@@ -903,17 +899,17 @@ p = ggplot() +
                    y=positions,
                    height=densities*2000,
                    group=labID,
-                   color=Type),fill='transparent',linewidth=0.3) +
+                   color=Type),fill='transparent') +
   theme_classic() +
-  scale_fill_manual(values=c('green','#2166ac','#053061','#67001f','#b2182b'))+
-  scale_color_manual(values=c('green','#2166ac','#053061','#b2182b','#67001f'))+
+  scale_fill_manual(values=c('#b2df8a','#a6cee3','#a6cee3','#fdbf6f','#fdbf6f'))+
+  scale_color_manual(values=c('#b2df8a','#a6cee3','#a6cee3','#fdbf6f','#fdbf6f'))+
   scale_y_reverse() +
   scale_x_reverse() +
   labs(x='Age (yrs BP)',y='Depth (cm)')
 
 p
 
-ggsave('figures/BChron age-depth model comparison FF vs macros.pdf',p,height=4,width=7)
+ggsave('figures/geochronology/BChron age-depth model comparison FF vs macros.pdf',p,height=4,width=7)
 
 ```
 
@@ -1047,7 +1043,7 @@ p_agespread=ggplot() +
                linetype='dashed',color='grey50',alpha=0.5)+
   theme_classic() +
   scale_y_reverse(breaks=c(0,250,500,750),limits=c(880,0)) +
-  scale_fill_roma(discrete=TRUE)+
+  scale_fill_brewer(palette='Paired')+
   labs(x='Normalised age difference (yrs)',y='Depth (cm)')
 
 p_inset=ggplot() +
@@ -1073,7 +1069,7 @@ plot = cowplot::ggdraw() +
 
 plot
 
-ggsave('figures/finefraction_vs_macros_agespread_95HDR.pdf',plot, width=8, height=5)
+ggsave('figures/geochronology/finefraction_vs_macros_agespread_95HDR.pdf',plot, width=8, height=5)
 
 paste('The 2-sigma spread of the normalised ages across all depths, which we apply as the bulk uncertainty to bulk radiocarbon dated mangrove peat samples, is +/-', round(HDR_2sd,digits=0),'years.')
 ```
