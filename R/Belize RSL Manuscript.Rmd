@@ -30,6 +30,7 @@ library(pastecs)
 library(hdrcde) # to compute highest density region
 library(ggridges)
 library(Bchron)
+library(khroma)
 
 ```
 
@@ -1076,348 +1077,14 @@ paste('The 2-sigma spread of the normalised ages across all depths, which we app
 
 # Age-depth model
 
-We run sensitivity tests on the age-depth model, to test the influence of data sampling, data density, and model used (BChron vs rBacon).
+## Full age-depth model 
 
-## BChron sensitivity test
-
-We test if the kinks in the age-depth model are due to data density, and having repeated ages sampled at a single depth.To do so, we run the age-depth model for 10 random samples of unique depths (one sample per depth), and then systematically leaving out every nth sample (e.g., leave out every 2nd sample, every 3rd sample ... until every 10th sample). We go up till removing every 10th samples as after the 10, the data density plateaus.
-
-### Generate data subsets
-
-We first generate 10 random data subsets, each with just one unique sample per depth. Then for each of the 10 subsets, we thin it by removing every nth sample (e.g., every 2nd sample, every 3rd sample, ...) 
-
-```{r generate data subsets with unique dates per depth and thinned systematically}
-
-# subsample dates removing every nth sample systematically in each successive test set
-
-allsets = data.frame()
-set.seed(42)
-
-paireddates = dates %>% group_by(Depth) %>% mutate(count=n()) %>% filter(count>1)
-singledates = dates %>% group_by(Depth) %>% mutate(count=n()) %>% filter(count==1)
-
-
-for (n in 1:10) { # generate 10 test sets; for each test set,
-  
-  # to store in this test set
-  this_set = data.frame() 
-  
-  for (i in 1:length(unique(paireddates$Depth))) { # at each depth with repeated ages
-    
-    # find ages in that depth   
-    depth_dates = filter(dates,Depth==unique(paireddates$Depth)[i]) %>% mutate(row_within_depth=seq_along(labID))
-    # randomly sample one age
-    id = sample(depth_dates$row_within_depth,1) 
-    depth_unique = slice(depth_dates,id) 
-    # append to store with other depths in this test set 
-    this_set = bind_rows(this_set, depth_unique)
-  }
-  
-  # add dates where there is only one date per depth 
-  this_set = bind_rows(this_set, singledates) %>% mutate(subset = as.factor(n)) %>% arrange(Depth)
-  
-  # for this complete test set, systematically remove every ath sample, from every 2nd sample ... to every 10th sample
-  for (a in 2:10) {
-  toremove = seq(from=a,by=a,to=floor(nrow(this_set)/a)*a)
-  thinned_dataset=slice(this_set,-toremove)  %>% 
-    mutate(removalID=a)
-  thinned_dataset = thinned_dataset %>% mutate(runID=paste0('Set',n,'_thinned_',a),
-                             samplesize=nrow(thinned_dataset))
-  allsets = bind_rows(allsets,thinned_dataset)
-  }
-  
-}
-
-# plot data density with a (every ath sample being removed): to illustrate that sample size plateaus when a~10
-ggplot(data=allsets) +
-   geom_point(aes(x=removalID,y=samplesize)) +
-  theme_classic() +
-  labs(x='n', y='Sample size')
-
-
-p = ggplot() +
-  # plot fine fraction dates
-  geom_point(data=allsets,
-                 aes(x=age,
-                   y=Depth,color=subset))+
-  theme_classic() +
-  scale_x_reverse()+
-  scale_y_reverse()+
-  facet_wrap(~runID) +
-  scale_color_batlow(discrete = TRUE) +
-  theme(legend.position = 'bottom') +
-  guides(colour = guide_legend(nrow = 1)) +
-  labs(x='Conventional age (yrs)', 'Depth (m)')
-
-p 
-
-ggsave('figures/BChron_agedepth_sensitivity_subsets.pdf',p,height=9,width=13)
-
-```
-
-### Cross validation
-
-We perform cross validation to assess the BChron model performance for each of these subsets. 
-
-```{r BChron cross validation functions}
-
-# function to compute RMSE in any given iteration of k-fold cross validation by comparing residuals between training and test dataset
-compareTrainTest = function(training_set,test_set){
-  
-  # fit age-depth model to training dataset and generate predictions at the depths of the test set
-  age_depth = with(training_set,
-                 Bchronology(ages = age,
-                             ageSds = sd,
-                             calCurves = curve,
-                             positions = Depth,
-                             positionThicknesses = Thickness,
-                             ids = labID,
-                             predictPositions = test_set$Depth,
-                             extractDate = -69))
-
-  # reformat 
-  age_depth = summary(age_depth,type="quantiles",prob=c(0.025,0.5,0.975)) %>%
-    rename(lwr_2sd=`2.5%`,median=`50%`,upr_2sd=`97.5%`)
-  
-  # calibrate ages of the test set
-  testages = with(test_set,
-                  BchronCalibrate(ages = age,
-                                  ageSds = sd,
-                                  calCurves = curve,
-                                  positions = Depth,
-                                  ids = labID)) %>% rbindlist(idcol=TRUE)
-  # reformat test ages (true)
-  testages = testages %>% group_by(positions) %>% summarise(lwr_true=quantile(ageGrid,probs=0.025),
-                                                  median_true=quantile(ageGrid,probs=0.5),
-                                                  upr_true=quantile(ageGrid,probs=0.975)) %>% rename(Depth=positions)
-  
-  # calcualte RMSE based on difference of true and predicted ages
-  combined = inner_join(testages,age_depth,by='Depth')
-  return(combined)
-}
-
-# perform K-fold cross validation, in which the data is split into K groups, and RMSE is computed K times, each time using a different test set.
-cvFunc = function(x,K) {
-  
-  set.seed(42)
-  
-  cat(sprintf("Started cross-validation test %s at %s\n", x, Sys.time()))
-  
-  # get data subset 
-  data=filter(allsets,runID==x)
-  
-  # split data into K groups
-  groups = sample(rep(1:K, length.out = nrow(data))) # randomly shuffles the distribution of data
-  data = data %>% mutate(groups = as.factor(groups))
-  
-  # unique list of the group numbers
-  group_numbers = as.matrix(1:K)
-  
-  # function to compute RMSE for a given test set 
-  predictComparison = function(a) {
-    # define test set
-    test_set = slice(data,which(groups==group_numbers[a])) %>% arrange(Depth)
-    # define training set
-    training_set = slice(data,which(groups!=group_numbers[a]))%>% arrange(Depth)
-    
-    # compute train model and predict at the depths of training set
-    comparison = compareTrainTest(training_set,test_set)
-    return (comparison)
-  }
-  
-  # calculate RMSE for all K iterations of the K-fold cross validation 
-  results = apply(group_numbers,MARGIN=1,FUN=predictComparison)%>% rbindlist() %>% arrange(Depth)
-  results = results %>% mutate(test_error=sqrt(mean((results$median_true - results$median)^2)),
-                               subset=data$subset,
-                               runID=data$runID,
-                               nfold = K)
-  return(results)
-
-}
-```
-
-
-```{r run cross validation for age-depth model sensitivity runs}
-
-################################## UNCOMMENT TO RE-RUN ##################################
-# # run cross validation test (K = 3) for all subsets of data to assess which model has better performance.
-# toapply = as.list((unique(allsets$runID)))
-# cv = lapply(toapply,function(x) cvFunc(x,K=5)) %>% rbindlist()
-# 
-# # export cross validation results as .csv
-# write.csv(cv,'results/BChron_agedepth_crossvalidationresults.csv')
-
-#########################################################################################
-
-# load cross validation results 
-cv = read.csv('results/BChron_agedepth_crossvalidationresults.csv') %>% mutate(subset=as.factor(subset))
-
-# print lowest RMSE 
-paste('The lowest RMSE is for run:',unique(cv$runID[which(cv$test_error==min(cv$test_error))]),'with test RMSE of',round(min(cv$test_error),digits=0),'years.')
-
-# plot cross validation results
-p=ggplot() +
-  geom_point(data=cv,aes(x=median_true,y=median,color=subset)) +
-  geom_segment(data=cv,aes(x=median_true,xend=median_true,y=lwr_2sd,yend=upr_2sd,color=subset)) +
-  geom_segment(data=cv,aes(x=lwr_true,xend=upr_true,y=median,yend=median,color=subset)) +
-  geom_abline(slope=1)+
-  geom_text(data=cv,aes(x=3500,y=9000,label=paste('RMSE:',round(test_error,digits=0),'yrs')),size=3)+
-  theme_classic() +
-  labs(x='True Age (BP)',y='Predicted Age (BP)') +
-  scale_x_reverse()+
-  scale_y_reverse()+
-  scale_color_batlow(discrete = TRUE) +
-  theme(legend.position = 'bottom') +
-  guides(colour = guide_legend(nrow = 1)) +
-  facet_wrap(~runID)
-
-p
-
-ggsave('figures/BChron_agedepth_crossvalidationresults.pdf',p,height=9.5,width=14)
-```
-
-### Run BChron for subsets
-
-```{r sensitivity test BChron unique ages each depth}
-
-toapply=as.list(unique(allsets$runID))
-
-# function to run the sensitivity test
-runBChronSensitivitySingleAges = function(x){
-  
-  # log_file <- sprintf("logs/run_%03d.log", x)
-  # sink(log_file, append=TRUE, split=TRUE)
-  cat(sprintf("Started run %s at %s\n", x, Sys.time()))
-  
-  datestorun = filter(allsets,runID==x) 
-  
-  result = tryCatch(
-    withCallingHandlers({
-    
-  # run age-depth model
-  age_depth = with(datestorun,
-                 Bchronology(ages = age,
-                             ageSds = sd,
-                             calCurves = curve,
-                             positions = Depth,
-                             positionThicknesses = Thickness,
-                             ids = labID,
-                             predictPositions = PDL$depth*100,
-                             extractDate = -69))
-  
-  # reformat for plotting in ggplot
-    age_depth_alldata_bchron = summary(age_depth,type="quantiles",prob=c(0.025,0.5,0.975)) %>%
-      rename(lwr_2sd=`2.5%`,median=`50%`,upr_2sd=`97.5%`) %>% 
-      mutate(model=as.factor(x),removalID=datestorun$removalID[1],subset=datestorun$subset[1])
-    age_depth_alldata_bchron
-  }, 
-  
-  # intercept run if error message is encountered and output warning
-  warning = function(w) {
-      if (grepl("truncatedWalk.*lower limit higher than upper limit", conditionMessage(w))) {
-        message(sprintf("⚠️ Skipping run %s due to truncatedWalk warning", x))
-        invokeRestart("muffleWarning")  # prevent warning from propagating
-        stop("Invalid prior constraints (truncatedWalk)")  # convert to error so tryCatch handles it
-      }
-  }),
-    
-  # output error message if run fails
-  error = function(e) {
-    message(sprintf("❌ Bchronology failed on run %s: %s", x, e$message))
-    return(NULL)
-  })
-  
-  # otherwise output result
-  cat(sprintf("Finished run %s at %s\n\n", x, Sys.time()))
-  sink()
-  return(result)
-}
-
-################################## UNCOMMENT TO RE-RUN ###########################################
-# Run sensitivity analysis
-# BChron_sensitivity_runs_SingleAges = lapply(toapply,FUN=runBChronSensitivitySingleAges)
-# BChron_sensitivity_runs_SingleAges = BChron_sensitivity_runs_SingleAges %>% rbindlist()
-# write.csv(BChron_sensitivity_runs_SingleAges,'results/BChron_bootstrap_runs_SingleAges.csv')
-##################################################################################################
-
-# load results of sensitivity analysis
-BChron_sensitivity_runs_SingleAges_tidy=read.csv('results/BChron_bootstrap_runs_SingleAges.csv')
-BChron_sensitivity_runs_SingleAges_tidy = BChron_sensitivity_runs_SingleAges_tidy %>%
-  mutate(removalID= substr(model,
-                         nchar(as.character(model))-1,
-                         nchar(as.character(model))))
-
-# calculate summary stats for sensitivity runs 
-SingleAgesSummary=BChron_sensitivity_runs_SingleAges_tidy %>% group_by(Depth) %>% summarise(lwr=quantile(median,0.025),upr=quantile(median,0.975))
-SingleAgesSummary = SingleAgesSummary %>% mutate(mid=(lwr+upr)/2,model='Sensitivity test')
-
-# load BChron age-depth model full run results
-age_depth_alldata_bchron=read.csv('results/age-depth model outputs/age-depth_alldata_Bchron.csv') %>% mutate(model='BChron Full Run')
-
-# plot
-plot_SingleAges_faceted = ggplot() +
-  # plot sensitivity test age-depth models
-  geom_path(data=BChron_sensitivity_runs_SingleAges_tidy, aes(x=median,y=Depth,group=model),linewidth=0.1,color='#92c5de') +
-  theme_classic() +
-  scale_x_reverse() +
-  scale_y_reverse() +
-  facet_wrap(~removalID) +
-  labs(x='Age (BP)',y='Depth (m)') +
-  ggtitle('Age-depth model removing every nth sample') +
-  theme(legend.position = 'none')
-
-plot_SingleAges_Summary = ggplot() +
-  # plot Bchron full run used for RSL calculations
-  geom_path(data=age_depth_alldata_bchron,
-            aes(y=Depth,x=median,color=model),linewidth=0.2) +
-  geom_path(data=age_depth_alldata_bchron,
-            aes(y=Depth,x=lwr_2sd,color=model),linetype='longdash',linewidth=0.2) +
-  geom_path(data=age_depth_alldata_bchron,
-            aes(y=Depth,x=upr_2sd,color=model),linetype='longdash',linewidth=0.2) +
-  # plot sensitivity test summary
-  geom_ribbon(data=SingleAgesSummary,
-            aes(xmin=lwr,xmax=upr,y=Depth,fill=model),alpha=0.5)+
-  geom_path(data=SingleAgesSummary,
-            aes(x=mid,y=Depth,color=model),linewidth=0.4)+
-  theme_classic() +
-  scale_x_reverse()+
-  scale_y_reverse() +
-  scale_color_manual(values=c('black','#92c5de')) +
-  scale_fill_manual(values=c('#92c5de','black'))
-
-plot_SingleAges = cowplot::plot_grid(plot_SingleAges_faceted,plot_SingleAges_Summary,nrow=2,align='hv',axis='l',rel_heights=c(2,1))
-
-plot_SingleAges
-
-ggsave('figures/BChronSingleAges_DataDensitySensitivity.pdf',
-       plot_SingleAges,height=6,width=6)
-
-```
-
-
-## BChron vs rBacon
-
-We compare BChron vs rBacon to assess model bias. For this, we use all radiocarbon dates as inputs to both models.
-
-```{r rBacon age-depth model, eval=FALSE}
-
-Bacon.cleanup() # clean up any history/ memory
-# age_depth_bacon= Bacon(core='GR19C1',coredir = 'Bacon_runs/',thick=10,d.max=1206,depths=PDL$depth*100)
-
-# thick: controls how smooth the model is (no. of sections to divide into); smaller number more smooth
-# cc: in excel input file, cc=1: IntCal20 curve; cc=: calendar date; default is cc=1;
-# d.max: to extrapolate below lowest dated depth
-# d.min: to extrapolate above highest dated depth (previously used d.min=0)
-# d.by: depth intervals at which ages are calculated (previously used d.by=10)
-# default depth unit: cm
-# default age unit: yrs
-
-```
+To make full use of all C14 information, we use all dates embedded in the BChron age-depth model. We also perform a cross-validation test on the full age-depth model.
 
 ```{r BChron age-depth model, eval=FALSE}
 
 # load all dates 
-dates=read.csv('results/dating results consolidated.csv')
+dates=read.csv('results/geochronology/C14 dating results consolidated.csv')
 
 # run age-depth model
 # age_depth = with(dates,
@@ -1434,178 +1101,29 @@ dates=read.csv('results/dating results consolidated.csv')
 # save(age_depth,file='results/age-depth model outputs/age-depth_alldata.Rdata')
 
 # load age-depth model output
-load('results/age-depth model outputs/age-depth_alldata.Rdata')
+load('results/geochronology/age-depth model outputs/age-depth_alldata.Rdata')
 
 # reformat for plotting in ggplot
 age_depth_alldata_bchron = summary(age_depth,type="quantiles",prob=c(0.025,0.5,0.975)) %>% rename(lwr_2sd=`2.5%`,median=`50%`,upr_2sd=`97.5%`) %>% mutate(model='Bchron')
 
-write_csv(age_depth_alldata_bchron,file='results/age-depth model outputs/age-depth_alldata_Bchron.csv')
+write_csv(age_depth_alldata_bchron,file='results/geochronology/age-depth model outputs/age-depth_alldata_Bchron.csv')
 
 ```
-
-```{r plot Bchron vs Bacon age-depth models}
-
-# load BChron age-depth model results
-age_depth_alldata_bchron=read.csv('results/age-depth model outputs/age-depth_alldata_Bchron.csv')
-
-# load Bacon results (thick=10)
-# min and max represent the ranges of the 95% credible interval
-age_depth_alldata_bacon=read.delim('Bacon_runs/GR19C1/GR19C1_122_ages.txt') %>% mutate(model='rBacon (all data)')
-
-# load dates
-dates_30Sep2019 = tidyC14results('data/C14 dates/Belize C14 results 30Sep2019 IntCal13.xlsx')
-dates_2021 = readxl::read_xlsx('data/C14 dates/Belize C14 results 2021 IntCal20.xlsx',sheet=2) %>% select(labID:Pretreatment)
-dates = rbind(dates_30Sep2019,
-                  dates_2021)
-dates = arrange(dates,Depth)
-
-# calibrate ages (macros)
-dates_macros = filter(dates,Type=='macro')
-calib_dates_modelled_macros = with(dates_macros,
-                            BchronCalibrate(ages = age,
-                                            ageSds = sd,
-                                            calCurves = curve,
-                                            positions = Depth,
-                                            ids = labID)) %>% rbindlist(idcol=TRUE)
-calib_dates_modelled_macros = calib_dates_modelled_macros %>% mutate(type='macro') 
-
-# calibrate ages (fine fraction)
-dates_FF = filter(dates,Type=='fine fraction')
-calib_dates_modelled_FF = with(dates_FF,
-                            BchronCalibrate(ages = age,
-                                            ageSds = sd,
-                                            calCurves = curve,
-                                            positions = Depth,
-                                            ids = labID)) %>% rbindlist(idcol=TRUE)
-calib_dates_modelled_FF = calib_dates_modelled_FF %>% mutate(type='fine fraction')
-
-# categorise outliers
-load('results/age-depth model outputs/age-depth_alldata.Rdata')
-outliers=summary(age_depth,type='outlier') %>% rename(`.id`=Date)
-
-# combine data frame
-calib_dates_modelled=bind_rows(calib_dates_modelled_FF,calib_dates_modelled_macros)
-calib_dates_modelled=full_join(calib_dates_modelled,outliers,by=".id")
-outlierdates=filter(calib_dates_modelled,OutlierProb>=0.9) %>% mutate(outlier_category=2) # outlier: cat=2
-nonoutlierdates=filter(calib_dates_modelled,OutlierProb<0.9) %>% mutate(outlier_category=1) # not outlier: cat=1
-calib_dates_modelled=bind_rows(outlierdates,nonoutlierdates) %>% mutate(outlier_category=factor(outlier_category,levels=c(1,2)))
-
-# remove pseudo core-top data point
-calib_dates_modelled = filter(calib_dates_modelled,.id!='core top')
-
-# plot stratigraphy
-plot_sampledepths = ggplot() + 
-  # peat layer
-  geom_rect(aes(ymin=0,
-                ymax=11.74,
-                xmin=0,xmax=1),fill='#543005')+
-  #transition layer
-  geom_rect(aes(ymin=11.74,
-                ymax=11.76,
-                xmin=0,xmax=1),fill='#bf812d')+
-  # marine basement layer
-  geom_rect(aes(ymin=11.76,
-                ymax=12.14,
-                xmin=0,xmax=1),fill='#bababa')+
-  # radiocarbon depths
-  geom_point(data=filter(dates,Type=='macro'),aes(x=0.3,y=Depth/100,color=Type))+
-  geom_point(data=filter(dates,Type=='fine fraction'),aes(x=0.7,y=Depth/100,color=Type))+
-  theme_classic()+
-  theme(axis.text.x=element_blank(),
-        axis.title.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        axis.line=element_blank(),
-        axis.text =element_text(size=15),
-        axis.title = element_text(face='bold',size=15),
-        legend.position = 'bottom',
-        panel.background = element_blank(),
-        panel.border=element_blank(),
-        plot.background = element_blank(),
-        plot.margin = margin(0,0,0,0,"cm")) +
-  scale_y_reverse(breaks=c(0,2.5,5,7.5,10),limits=c(12.5,0))+
-  #scale_color_vanimo(discrete=TRUE)+
-  scale_color_manual(values=c('#f1a340','#67a9cf'))+
-  labs(y='Depth (m)')
-
-p1 = ggplot() + 
-  # plot Bchron
-  geom_ribbon(data=age_depth_alldata_bchron,
-              aes(y=Depth,xmin=lwr_2sd,xmax=upr_2sd,fill=model),alpha=0.5) +
-  geom_path(data=age_depth_alldata_bchron,
-            aes(y=Depth,x=median,color=model)) +
-  # plot rBacon
-  geom_ribbon(data=age_depth_alldata_bacon,
-              aes(y=depth,xmin=min,xmax=max,fill=model),alpha=0.5) +
-  geom_path(data=age_depth_alldata_bacon,
-            aes(y=depth,x=mean,color=model)) +
-  # plot calibrated ages (outliers)
-  geom_ridgeline(data=filter(calib_dates_modelled,outlier_category==2),
-               aes(x=ageGrid,
-                   y=positions,
-                   height=densities*2000,
-                   group=.id,
-                   color=type),fill='transparent',linewidth=0.3) +
-   # plot calibrated ages (non-outliers)
-  geom_ridgeline(data=filter(calib_dates_modelled,outlier_category==1),
-               aes(x=ageGrid,
-                   y=positions,
-                   height=densities*2000,
-                   group=.id,
-                   fill=type),alpha=0.9,color='transparent') +
-  # theme
-  labs(x='Age (BP)',y='Depth (cm)',fill='Type') +
-  scale_fill_manual(values=c('#b8e186','#fc8d59','#3288bd','grey20'))+
-  scale_color_manual(values=c('#b8e186','#fc8d59','#3288bd','grey20'))+
-  theme_classic() +
-  scale_y_reverse(breaks=c(0,250,500,750,1000),limits=c(1250,0))+
-  scale_x_reverse(breaks=seq(from=0,to=8000,by=1000))+
-  theme(axis.text.x=element_text(size=15),
-        axis.title.x=element_text(size=15,face='bold'),
-        legend.text=element_text(size=15),
-        legend.title=element_text(size=15),
-        legend.position = 'bottom',
-        axis.text.y=element_blank(),
-        axis.title.y=element_blank(),
-        axis.ticks.y=element_blank(),
-        panel.background = element_blank(),
-        panel.border=element_blank(),
-        plot.background = element_blank(),
-        plot.margin = margin(t=0,b=0,l=0.3,0.3,"cm"))
-
-
-# add stratigraphy to plot
-
-p_all=cowplot::plot_grid(plot_sampledepths,p1,nrow=1,align='h',
-                         rel_widths = c(0.13,1))
-p_all
-
-ggsave('figures/BChron_vs_Bacon_age-depth_models.pdf',p_all,height=6,width=10)
-
-# manuscript text for number of outliers
-paste0('Of the 80 radiocarbon dates,',100-round((length(unique(outlierdates$.id))/length(unique(nonoutlierdates$.id)))*100,digits=0),'% of dates were non-outliers.(outliers:', length(unique(outlierdates$.id)),'; non-outliers:',length(unique(nonoutlierdates$.id)),')')
-
-```
-
-
-## Full age-depth model 
-
-To make full use of all information, we finally use all dates embedded in the BChron age-depth model. Here, we perform a cross-validation test on the full age-depth model.
 
 ```{r cross validation of full age-depth model}
 
 # load all dates 
-dates=read.csv('results/dating results consolidated.csv') 
+dates=read.csv('results/geochronology/C14 dating results consolidated.csv') 
 allsets = dates %>% mutate(runID='all dates',subset=0)
 
 # # run cross-validation test
 # cv_fullrun = cvFunc('all dates',10)
 # 
 # #export cross validation results as .csv
-# write.csv(cv_fullrun,'results/BChron_agedepth_10fold_crossvalidationresults_fullrun.csv')
+# write.csv(cv_fullrun,'results/geochronology/age-depth model outputs/BChron_agedepth_10fold_crossvalidationresults_fullrun.csv')
 
 # load cross validation results 
-# cv_fullrun = read.csv('results/BChron_agedepth_crossvalidationresults_fullrun.csv') %>% mutate(subset=as.factor(subset))
-cv_fullrun = read.csv('results/BChron_agedepth_10fold_crossvalidationresults_fullrun.csv') %>% mutate(subset=as.factor(subset))
+cv_fullrun = read.csv('results/geochronology/age-depth model outputs/BChron_agedepth_10fold_crossvalidationresults_fullrun.csv') %>% mutate(subset=as.factor(subset))
 
 # calculate R-squared
 r_squared = cor(cv_fullrun$median_true, cv_fullrun$median)^2
@@ -1628,18 +1146,18 @@ p = ggplot() +
 
 p
 
-ggsave('figures/BChron_agedepth_crossvalidationresults_fullrun.pdf',p,height=5,width=8)
+ggsave('figures/geochronology/BChron_agedepth_crossvalidationresults_fullrun.pdf',p,height=5,width=8)
 
 ```
 
 ```{r plot full BChron model}
 
 # load BChron age-depth model results
-age_depth_alldata_bchron=read.csv('results/age-depth model outputs/age-depth_alldata_Bchron.csv')
+age_depth_alldata_bchron=read.csv('results/geochronology/age-depth model outputs/age-depth_alldata_Bchron.csv')
 
 # load dates
-dates_30Sep2019 = tidyC14results('data/C14 dates/Belize C14 results 30Sep2019 IntCal13.xlsx')
-dates_2021 = readxl::read_xlsx('data/C14 dates/Belize C14 results 2021 IntCal20.xlsx',sheet=2) %>% select(labID:Pretreatment)
+dates_30Sep2019 = tidyC14results('data/geochronology/C14_dates/Belize C14 results 30Sep2019 IntCal13.xlsx')
+dates_2021 = readxl::read_xlsx('data/geochronology/C14_dates/Belize C14 results 2021 IntCal20.xlsx',sheet=2) %>% select(labID:Pretreatment)
 dates = rbind(dates_30Sep2019,
                   dates_2021)
 dates = arrange(dates,Depth)
@@ -1665,7 +1183,7 @@ calib_dates_modelled_FF = with(dates_FF,
 calib_dates_modelled_FF = calib_dates_modelled_FF %>% mutate(type='fine fraction')
 
 # categorise outliers
-load('results/age-depth model outputs/age-depth_alldata.Rdata')
+load('results/geochronology/age-depth model outputs/age-depth_alldata.Rdata')
 outliers=summary(age_depth,type='outlier') %>% rename(`.id`=Date)
 
 # combine data frame
@@ -1759,9 +1277,328 @@ p_all=cowplot::plot_grid(plot_sampledepths,p1,nrow=1,align='h',
                          rel_widths = c(0.13,1))
 p_all
 
-ggsave('figures/BChron_age-depth_model.pdf',p_all,height=6,width=10)
+ggsave('figures/geochronology/BChron_age-depth_model.pdf',p_all,height=6,width=10)
 
 ```
+
+## BChron sensitivity test
+
+We run sensitivity tests on the age-depth model, to test the influence of data sampling and data density on the resulting age-depth model output.
+
+To do so, we run the age-depth model for 10 random samples of unique depths (one sample per depth), and then systematically leaving out every nth sample (e.g., leave out every 2nd sample, every 3rd sample ... until every 10th sample). We go up till removing every 10th samples as after the 10, the data density plateaus.
+
+### Generate data subsets
+
+We first generate 10 random data subsets, each with just one unique sample per depth. Then for each of the 10 subsets, we thin it by removing every nth sample (e.g., every 2nd sample, every 3rd sample, ...) 
+
+```{r generate data subsets with unique dates per depth and thinned systematically}
+
+# subsample dates removing every nth sample systematically in each successive test set
+
+allsets = data.frame()
+set.seed(42)
+
+paireddates = dates %>% group_by(Depth) %>% mutate(count=n()) %>% filter(count>1)
+singledates = dates %>% group_by(Depth) %>% mutate(count=n()) %>% filter(count==1)
+
+
+for (n in 1:10) { # generate 10 test sets; for each test set,
+  
+  # to store in this test set
+  this_set = data.frame() 
+  
+  for (i in 1:length(unique(paireddates$Depth))) { # at each depth with repeated ages
+    
+    # find ages in that depth   
+    depth_dates = filter(dates,Depth==unique(paireddates$Depth)[i]) %>% mutate(row_within_depth=seq_along(labID))
+    # randomly sample one age
+    id = sample(depth_dates$row_within_depth,1) 
+    depth_unique = slice(depth_dates,id) 
+    # append to store with other depths in this test set 
+    this_set = bind_rows(this_set, depth_unique)
+  }
+  
+  # add dates where there is only one date per depth 
+  this_set = bind_rows(this_set, singledates) %>% mutate(subset = as.factor(n)) %>% arrange(Depth)
+  
+  # for this complete test set, systematically remove every ath sample, from every 2nd sample ... to every 10th sample
+  for (a in 2:10) {
+  toremove = seq(from=a,by=a,to=floor(nrow(this_set)/a)*a)
+  thinned_dataset=slice(this_set,-toremove)  %>% 
+    mutate(removalID=a)
+  thinned_dataset = thinned_dataset %>% mutate(runID=paste0('Set',n,'_thinned_',a),
+                             samplesize=nrow(thinned_dataset))
+  allsets = bind_rows(allsets,thinned_dataset)
+  }
+  
+}
+
+# plot data density with a (every ath sample being removed): to illustrate that sample size plateaus when a~10
+ggplot(data=allsets) +
+   geom_point(aes(x=removalID,y=samplesize)) +
+  theme_classic() +
+  labs(x='n', y='Sample size')
+
+
+p = ggplot() +
+  # plot fine fraction dates
+  geom_point(data=allsets,
+                 aes(x=age,
+                   y=Depth,color=subset))+
+  theme_classic() +
+  scale_x_reverse()+
+  scale_y_reverse()+
+  facet_wrap(~runID) +
+  scale_color_batlow(discrete = TRUE) +
+  theme(legend.position = 'bottom') +
+  guides(colour = guide_legend(nrow = 1)) +
+  labs(x='Conventional age (yrs)', 'Depth (m)')
+
+p 
+
+ggsave('figures/geochronology/BChron_agedepth_sensitivity_subsets.pdf',p,height=9,width=13)
+
+```
+
+### Cross validation
+
+We perform cross validation to assess the BChron model performance for each of these subsets. 
+
+```{r BChron cross validation functions}
+
+# function to compute RMSE in any given iteration of k-fold cross validation by comparing residuals between training and test dataset
+compareTrainTest = function(training_set,test_set){
+  
+  # fit age-depth model to training dataset and generate predictions at the depths of the test set
+  age_depth = with(training_set,
+                 Bchronology(ages = age,
+                             ageSds = sd,
+                             calCurves = curve,
+                             positions = Depth,
+                             positionThicknesses = Thickness,
+                             ids = labID,
+                             predictPositions = test_set$Depth,
+                             extractDate = -69))
+
+  # reformat 
+  age_depth = summary(age_depth,type="quantiles",prob=c(0.025,0.5,0.975)) %>%
+    rename(lwr_2sd=`2.5%`,median=`50%`,upr_2sd=`97.5%`)
+  
+  # calibrate ages of the test set
+  testages = with(test_set,
+                  BchronCalibrate(ages = age,
+                                  ageSds = sd,
+                                  calCurves = curve,
+                                  positions = Depth,
+                                  ids = labID)) %>% rbindlist(idcol=TRUE)
+  # reformat test ages (true)
+  testages = testages %>% group_by(positions) %>% summarise(lwr_true=quantile(ageGrid,probs=0.025),
+                                                  median_true=quantile(ageGrid,probs=0.5),
+                                                  upr_true=quantile(ageGrid,probs=0.975)) %>% rename(Depth=positions)
+  
+  # calcualte RMSE based on difference of true and predicted ages
+  combined = inner_join(testages,age_depth,by='Depth')
+  return(combined)
+}
+
+# perform K-fold cross validation, in which the data is split into K groups, and RMSE is computed K times, each time using a different test set.
+cvFunc = function(x,K) {
+  
+  set.seed(42)
+  
+  cat(sprintf("Started cross-validation test %s at %s\n", x, Sys.time()))
+  
+  # get data subset 
+  data=filter(allsets,runID==x)
+  
+  # split data into K groups
+  groups = sample(rep(1:K, length.out = nrow(data))) # randomly shuffles the distribution of data
+  data = data %>% mutate(groups = as.factor(groups))
+  
+  # unique list of the group numbers
+  group_numbers = as.matrix(1:K)
+  
+  # function to compute RMSE for a given test set 
+  predictComparison = function(a) {
+    # define test set
+    test_set = slice(data,which(groups==group_numbers[a])) %>% arrange(Depth)
+    # define training set
+    training_set = slice(data,which(groups!=group_numbers[a]))%>% arrange(Depth)
+    
+    # compute train model and predict at the depths of training set
+    comparison = compareTrainTest(training_set,test_set)
+    return (comparison)
+  }
+  
+  # calculate RMSE for all K iterations of the K-fold cross validation 
+  results = apply(group_numbers,MARGIN=1,FUN=predictComparison)%>% rbindlist() %>% arrange(Depth)
+  results = results %>% mutate(test_error=sqrt(mean((results$median_true - results$median)^2)),
+                               subset=data$subset,
+                               runID=data$runID,
+                               nfold = K)
+  return(results)
+
+}
+```
+
+
+```{r run cross validation for age-depth model sensitivity runs}
+
+################################## UNCOMMENT TO RE-RUN ##################################
+# # run cross validation test (K = 3) for all subsets of data to assess which model has better performance.
+# toapply = as.list((unique(allsets$runID)))
+# cv = lapply(toapply,function(x) cvFunc(x,K=5)) %>% rbindlist()
+# 
+# # export cross validation results as .csv
+# write.csv(cv,'results/geochronology/age-depth model outputs/BChron_agedepth_crossvalidationresults.csv')
+
+#########################################################################################
+
+# load cross validation results 
+cv = read.csv('results/geochronology/age-depth model outputs/BChron_agedepth_crossvalidationresults.csv') %>% mutate(subset=as.factor(subset))
+
+# print lowest RMSE 
+paste('The lowest RMSE is for run:',unique(cv$runID[which(cv$test_error==min(cv$test_error))]),'with test RMSE of',round(min(cv$test_error),digits=0),'years.')
+
+# plot cross validation results
+p=ggplot() +
+  geom_point(data=cv,aes(x=median_true,y=median,color=subset)) +
+  geom_segment(data=cv,aes(x=median_true,xend=median_true,y=lwr_2sd,yend=upr_2sd,color=subset)) +
+  geom_segment(data=cv,aes(x=lwr_true,xend=upr_true,y=median,yend=median,color=subset)) +
+  geom_abline(slope=1)+
+  geom_text(data=cv,aes(x=3500,y=9000,label=paste('RMSE:',round(test_error,digits=0),'yrs')),size=3)+
+  theme_classic() +
+  labs(x='True Age (BP)',y='Predicted Age (BP)') +
+  scale_x_reverse()+
+  scale_y_reverse()+
+  scale_color_batlow(discrete = TRUE) +
+  theme(legend.position = 'bottom') +
+  guides(colour = guide_legend(nrow = 1)) +
+  facet_wrap(~runID)
+
+p
+
+ggsave('figures/geochronology/BChron_agedepth_crossvalidationresults.pdf',p,height=9.5,width=14)
+```
+
+### Run BChron for subsets
+
+```{r sensitivity test BChron unique ages each depth}
+
+toapply=as.list(unique(allsets$runID))
+
+# function to run the sensitivity test
+runBChronSensitivitySingleAges = function(x){
+  
+  # log_file <- sprintf("logs/run_%03d.log", x)
+  # sink(log_file, append=TRUE, split=TRUE)
+  cat(sprintf("Started run %s at %s\n", x, Sys.time()))
+  
+  datestorun = filter(allsets,runID==x) 
+  
+  result = tryCatch(
+    withCallingHandlers({
+    
+  # run age-depth model
+  age_depth = with(datestorun,
+                 Bchronology(ages = age,
+                             ageSds = sd,
+                             calCurves = curve,
+                             positions = Depth,
+                             positionThicknesses = Thickness,
+                             ids = labID,
+                             predictPositions = PDL$depth*100,
+                             extractDate = -69))
+  
+  # reformat for plotting in ggplot
+    age_depth_alldata_bchron = summary(age_depth,type="quantiles",prob=c(0.025,0.5,0.975)) %>%
+      rename(lwr_2sd=`2.5%`,median=`50%`,upr_2sd=`97.5%`) %>% 
+      mutate(model=as.factor(x),removalID=datestorun$removalID[1],subset=datestorun$subset[1])
+    age_depth_alldata_bchron
+  }, 
+  
+  # intercept run if error message is encountered and output warning
+  warning = function(w) {
+      if (grepl("truncatedWalk.*lower limit higher than upper limit", conditionMessage(w))) {
+        message(sprintf("⚠️ Skipping run %s due to truncatedWalk warning", x))
+        invokeRestart("muffleWarning")  # prevent warning from propagating
+        stop("Invalid prior constraints (truncatedWalk)")  # convert to error so tryCatch handles it
+      }
+  }),
+    
+  # output error message if run fails
+  error = function(e) {
+    message(sprintf("❌ Bchronology failed on run %s: %s", x, e$message))
+    return(NULL)
+  })
+  
+  # otherwise output result
+  cat(sprintf("Finished run %s at %s\n\n", x, Sys.time()))
+  sink()
+  return(result)
+}
+
+################################## UNCOMMENT TO RE-RUN ###########################################
+# Run sensitivity analysis
+# BChron_sensitivity_runs_SingleAges = lapply(toapply,FUN=runBChronSensitivitySingleAges)
+# BChron_sensitivity_runs_SingleAges = BChron_sensitivity_runs_SingleAges %>% rbindlist()
+# write.csv(BChron_sensitivity_runs_SingleAges,'results/geochronology/age-depth model outputs/BChron_bootstrap_runs_SingleAges.csv')
+##################################################################################################
+
+# load results of sensitivity analysis
+BChron_sensitivity_runs_SingleAges_tidy=read.csv('results/geochronology/age-depth model outputs/BChron_bootstrap_runs_SingleAges.csv')
+BChron_sensitivity_runs_SingleAges_tidy = BChron_sensitivity_runs_SingleAges_tidy %>%
+  mutate(removalID= substr(model,
+                         nchar(as.character(model))-1,
+                         nchar(as.character(model))))
+
+# calculate summary stats for sensitivity runs 
+SingleAgesSummary=BChron_sensitivity_runs_SingleAges_tidy %>% group_by(Depth) %>% summarise(lwr=quantile(median,0.025),upr=quantile(median,0.975))
+SingleAgesSummary = SingleAgesSummary %>% mutate(mid=(lwr+upr)/2,model='Sensitivity test')
+
+# load BChron age-depth model full run results
+age_depth_alldata_bchron=read.csv('results/geochronology/age-depth model outputs/age-depth_alldata_Bchron.csv') %>% mutate(model='BChron Full Run')
+
+# plot
+plot_SingleAges_faceted = ggplot() +
+  # plot sensitivity test age-depth models
+  geom_path(data=BChron_sensitivity_runs_SingleAges_tidy, aes(x=median,y=Depth,group=model),linewidth=0.1,color='#92c5de') +
+  theme_classic() +
+  scale_x_reverse() +
+  scale_y_reverse() +
+  facet_wrap(~removalID) +
+  labs(x='Age (BP)',y='Depth (m)') +
+  ggtitle('Age-depth model removing every nth sample') +
+  theme(legend.position = 'none')
+
+plot_SingleAges_Summary = ggplot() +
+  # plot Bchron full run used for RSL calculations
+  geom_path(data=age_depth_alldata_bchron,
+            aes(y=Depth,x=median,color=model),linewidth=0.2) +
+  geom_path(data=age_depth_alldata_bchron,
+            aes(y=Depth,x=lwr_2sd,color=model),linetype='longdash',linewidth=0.2) +
+  geom_path(data=age_depth_alldata_bchron,
+            aes(y=Depth,x=upr_2sd,color=model),linetype='longdash',linewidth=0.2) +
+  # plot sensitivity test summary
+  geom_ribbon(data=SingleAgesSummary,
+            aes(xmin=lwr,xmax=upr,y=Depth,fill=model),alpha=0.5)+
+  geom_path(data=SingleAgesSummary,
+            aes(x=mid,y=Depth,color=model),linewidth=0.4)+
+  theme_classic() +
+  scale_x_reverse()+
+  scale_y_reverse() +
+  scale_color_manual(values=c('black','#92c5de')) +
+  scale_fill_manual(values=c('#92c5de','black'))
+
+plot_SingleAges = cowplot::plot_grid(plot_SingleAges_faceted,plot_SingleAges_Summary,nrow=2,align='hv',axis='l',rel_heights=c(2,1))
+
+plot_SingleAges
+
+ggsave('figures/geochronology/BChronSingleAges_DataDensitySensitivity.pdf',
+       plot_SingleAges,height=6,width=6)
+
+```
+
 # Paleotidal range change
 
 This section of code formats the RSL data to the format needed to extract paleotides from Sulzbach et al. (2023) global paleotidal study. We extract paleotides not just for our core location, but also for all sites within the Belize database.
