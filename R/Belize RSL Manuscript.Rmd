@@ -1929,7 +1929,7 @@ RSL = mutate(RSL,
 RSL = RSL %>% filter(depth<=11.6) # filter ages to depths <= 11.6 m, corresponding to depth before drop in LOI, and depth where mangrove pollen still dominated. The lowest pollen sample at 11.67 m depth contained a lot of non-mangrove pollen, so we know the mangrove ended above 11.67 m depth. Strat observations indicate gradual transition at 11.70 m depth. Geochem supports mangrove existence at and above 11.54 m depth.
 
 
-write.csv(RSL,'results/SLIPs/RSLallages_Bchron_fullmethods.csv')
+write.csv(RSL,'results/RSL/RSLallages_Bchron_fullmethods.csv')
 ```
 
 ```{r export RSL}
@@ -1945,21 +1945,13 @@ RSL_EIVIGPinput=data.frame(
     AgeCE = 1950-RSL$mid_age # age in CE
   )
 
-write_csv(RSL_EIVIGPinput,file='results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv')
+write_csv(RSL_EIVIGPinput,file='results/RSL/RSLallages_Bchron_EIVIGPinput.csv')
 
-# # reformat RSL and export SLIPs for EIV-CP model
-# RSL_CPinput = 
-#   select(RSL_EIVIGPinput,c('Age','RSL','RSLError','AgeError')) %>%
-#   rename(year=Age,y=RSL,y_error=RSLError,year_error=AgeError) %>% mutate(year=1950-year) # export in CE as the CP model takes CE
-
-# export SLIPs in format for EIV-CP model runs
-# write_csv(RSL_CPinput,file='results/age-depth model outputs/RSLallages_rBacon_CPinput_thick10.csv')
-# write_csv(RSL_CPinput,file='results/age-depth model outputs/RSLallages_Bchron_CPinput.csv')
 ```
 
 ```{r Plot pseudo-SLIPs}
 
-RSL_EIVIGPinput = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv')
+RSL_EIVIGPinput = read.csv('results/RSL/RSLallages_Bchron_EIVIGPinput.csv')
 
 
 plotSLIPs=ggplot(mapping=aes(xmin=Age-Age_up_er_2sd,
@@ -1976,7 +1968,7 @@ plotSLIPs=ggplot(mapping=aes(xmin=Age-Age_up_er_2sd,
   
 plotSLIPs
 
-ggsave('figures/RSL SLIPs.pdf',plotSLIPs,width=12,height=6)
+ggsave('figures/RSL/RSL SLIPs.pdf',plotSLIPs,width=12,height=6)
 
 # Precision of the GR/19/C1 record
 paste0('The GR/19/C1 record has data precision of <',
@@ -2098,11 +2090,11 @@ RSL_EIVIGPinput=data.frame(
   )
 
 # save file
-write_csv(RSL_EIVIGPinput,file='results/SLIPs/RSLallages_Bchron_EIVIGPinput_asSLIPs.csv')
+write_csv(RSL_EIVIGPinput,file='results/RSL/RSLallages_Bchron_EIVIGPinput_asSLIPs.csv')
 
 # plot
 
-OriginalRSL = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv') %>% mutate(model='original')
+OriginalRSL = read.csv('results/RSL/RSLallages_Bchron_EIVIGPinput.csv') %>% mutate(model='original')
 
 RSL_EIVIGPinput = RSL_EIVIGPinput %>% mutate(model='test GR19C1 as SLIPs')
 # plot comparison of SLIPs to original pseudo-SLIPs
@@ -2125,7 +2117,7 @@ p = ggplot() +
   labs(x='Age (yrs BP)',y='RSL (m)')
 p
 
-ggsave('figures/RSL SLIPs compareContinuousCorevsSLIPs.pdf',p,width=8,height=6)
+ggsave('figures/RSL/RSL compareContinuousCorevsSLIPs.pdf',p,width=8,height=6)
 
 ```
 
@@ -2205,7 +2197,7 @@ calcGR19C1RSL = function(x) {
 
 # load results of age-depth sensitivity analysis 
 # (sampled one date per depth, and tested removing every nth sample)
-BChron_sensitivity_runs_SingleAges_tidy=read.csv('results/BChron_bootstrap_runs_SingleAges.csv')
+BChron_sensitivity_runs_SingleAges_tidy=read.csv('results/geochronology/BChron_bootstrap_runs_SingleAges.csv')
 BChron_sensitivity_runs_SingleAges_tidy = BChron_sensitivity_runs_SingleAges_tidy %>%
   mutate(removalID= substr(model,
                          nchar(as.character(model))-1,
@@ -2247,7 +2239,7 @@ ggplot(mapping=aes(xmin=Age-Age_up_er_2sd,
   facet_wrap(~removalID)
 
 # export to test stat model sensitivity to underlying age-depth model input
-write.csv(RSL_sensitivityruns_EIVIGPinput,'results/GR19C1_RSL_sensitivityruns_EIVIGPinput.csv')
+write.csv(RSL_sensitivityruns_EIVIGPinput,'results/RSL/GR19C1_RSL_sensitivityruns_EIVIGPinput.csv')
 
 ```
 
