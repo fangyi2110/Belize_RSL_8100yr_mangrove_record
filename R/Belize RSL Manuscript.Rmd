@@ -1631,7 +1631,7 @@ roundTime = function(paleotideinput,x){
 ```{r format Belize database for paleotidal data extraction}
 
 # load RSL data from database
-Belize_database = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx')
+Belize_database = readxl::read_xlsx('data/RSLdatabase/BelizeDatabase_6Aug2025.xlsx')
 
 # extract age, lat and lon columns, and convert time to kyrs, and add vicinity_size
 # for GR/19/C1 core, use mean age
@@ -1649,7 +1649,7 @@ write.csv(paleotideinput_Belizedatabase,file='data/paleotides/paleotideinput_Bel
 ```{r format GR19C1 data for paleotidal data extraction}
 
 # load age-depth model for GR/19/C1 core
-age_depth_alldata_bchron=read.csv('results/age-depth model outputs/age-depth_alldata_Bchron.csv')
+age_depth_alldata_bchron=read.csv('results/geochronology/age-depth model outputs/age-depth_alldata_Bchron.csv')
 
 # extract age, lat and lon columns, and convert time to kyrs, and add vicinity_size
 # for GR/19/C1 core, use mean age
@@ -1723,8 +1723,8 @@ Sulzbachmodel2023_modelresults_raw = bind_rows(
   ) # Belize database 
 
 # load present-day tidal datums
-OSU_Belize = read.csv('data/paleotides/Belize OSU tidal datums.csv',skip=1) %>% mutate(model='OSU') # load OSU
-load('data/CBC_UTidedatums.Rdata') # load UTide model datums for Twin Cays Sites
+OSU_Belize = read.csv('data/tides/Belize OSU tidal datums.csv',skip=1) %>% mutate(model='OSU') # load OSU
+load('data/tides/CBC_UTidedatums.Rdata') # load UTide model datums for Twin Cays Sites
 UTide_datums = UTide_datums %>% mutate(level_msl = level-filter(UTide_datums,datum=='MSL')$level) %>% select(c('datum','level_msl')) %>% pivot_wider(names_from='datum',values_from='level_msl') # format UTide datums
 
 # replace OSU with UTide model for Twin Cays data
@@ -1775,7 +1775,7 @@ Sulzbachmodel_paleotides = Sulzbachmodel_paleotides %>% mutate(range=MHWS-MLWS)
 Sulzbachmodel_paleotides = Sulzbachmodel_paleotides %>% mutate(tidalrangechange=range-(presentdaydatums_Belize$MHWS-presentdaydatums_Belize$MLWS))
 
 # export scaled paleotidal ranges
-write.csv(Sulzbachmodel_paleotides,'results/paleotides_Sulzbach2023_BelizeDatabse_6Aug2025.csv')
+write.csv(Sulzbachmodel_paleotides,'results/paleotides/paleotides_Sulzbach2023_BelizeDatabse_6Aug2025.csv')
 
 ```
 
@@ -1806,7 +1806,7 @@ p_tidalrangechange
 p_paleotides = cowplot::plot_grid(p_tidalrange,p_tidalrangechange,nrow=2,align='hv')
 p_paleotides
 
-ggsave('figures/compare_tidalrangechange_Hilletal2011_Sulzbachetal2023.pdf',p_paleotides,height=6,width=6)
+ggsave('figures/paleotides/compare_tidalrangechange_Hilletal2011_Sulzbachetal2023.pdf',p_paleotides,height=6,width=6)
 
 ```
 
@@ -1830,7 +1830,7 @@ p=ggplot(data=paleotides_TWC) +
 
 p
 
-ggsave('figures/paleoindicativerangechangeGR19C1.pdf',p,height=4,width=6)
+ggsave('figures/paleotides/paleoindicativerangechangeGR19C1.pdf',p,height=4,width=6)
 
 
 meanIRchange = mean(paleotides_TWC$paleoIRchange)
@@ -1847,10 +1847,10 @@ We calculate the decompacted RSL sequence for the GR/19/C1 core by applying the 
 ```{r calculate RSL}
 
 # load BChron age-depth model results (full dataset)
-age_depth_alldata_bchron=read.csv('results/age-depth model outputs/age-depth_alldata_Bchron.csv') %>% rename(depth=Depth) 
+age_depth_alldata_bchron=read.csv('results/geochronology/age-depth model outputs/age-depth_alldata_Bchron.csv') %>% rename(depth=Depth) 
 
 # load and calculate paleotidal levels for incorporating paleoindicative range change uncertainty 
-paleotides_TWC = read.csv('results/paleotides_Sulzbach2023_BelizeDatabse_6Aug2025.csv') %>% filter(sampleID=='GR/19/C1') %>% mutate(originalRWL=unforced_RWL,originalIR=unforced_IR)
+paleotides_TWC = read.csv('results/paleotides/paleotides_Sulzbach2023_BelizeDatabse_6Aug2025.csv') %>% filter(sampleID=='GR/19/C1') %>% mutate(originalRWL=unforced_RWL,originalIR=unforced_IR)
 paleotides_TWC = paleotides_TWC %>% mutate(newupper=pmax(HAT,(originalRWL+originalIR/2)),
                                            newlower=pmin(LAT,(originalRWL-originalIR/2))) 
 paleotides_TWC = paleotides_TWC %>% mutate(paleotide_corr_RWL=(newupper+newlower)/2,

@@ -1,0 +1,285 @@
+"time","lat","lon","IM","SampleID","StudySite","vicinity_size"
+0,16.74493333,-87.80166667,"0 - 5 m below low tide level","306-20","Glover's Reef",1
+5.5,16.74493333,-87.80166667,"0 - 5 m below low tide level","308-20","Glover's Reef",1
+6.5,16.74493333,-87.80166667,"0 - 5 m below low tide level","309-20","Glover's Reef",1
+6.5,16.78643333,-87.8623,"0 - 5 m below low tide level","312-20","Glover's Reef",1
+0,16.78503333,-87.8313,"0 - 5 m below low tide level","318-20","Glover's Reef",1
+1.5,17.225095,-87.52871,"< MTL","325-20","Lighthouse Reef",1
+4.5,17.225095,-87.52871,"0 - 5 m below low tide level","326-20","Lighthouse Reef",1
+0,17.37716667,-87.576,"0 - 5 m below low tide level","331-20","Lighthouse Reef",1
+2,17.4705,-87.48716667,"0 - 5 m below low tide level","336-20","Lighthouse Reef",1
+3,17.37333333,-87.53333333,"< MTL","342-20","Lighthouse Reef",1
+0,16.90983333,-88.08,"0 - 5 m below low tide level","346-20","Tobacco Cay",1
+6.5,16.90983333,-88.08,"0 - 5 m below low tide level","348-20","Tobacco Cay",1
+0,17.06933333,-87.99283333,"0 - 5 m below low tide level","354-20","Emily",1
+1.5,17.06933333,-87.99283333,"< MTL","355-20","Emily",1
+8,17.06933333,-87.99283333,"< MTL","226-21","Emily",1
+3.5,17.22616667,-88.04766667,"0 - 5 m below low tide level","359-20","Rendezvous Cay",1
+6.5,17.22616667,-88.04766667,"< MTL","360-20","Rendezvous Cay",1
+8.5,17.22616667,-88.04766667,"< MTL","362-20","Rendezvous Cay",1
+5.5,17.47933333,-88.042,"0 - 5 m below low tide level","367-20","Gallow's Point Reef",1
+7,17.47933333,-88.042,"0 - 5 m below low tide level","368-20","Gallow's Point Reef",1
+1,16.6955,-88.07483333,"< MTL","375-20","Carrie Bow Cay",1
+4,16.6955,-88.07483333,"0 - 5 m below low tide level","378-20","Carrie Bow Cay",1
+5,16.6955,-88.07483333,"< MTL","379-20","Carrie Bow Cay",1
+6.5,16.6955,-88.07483333,"< MTL","380-20","Carrie Bow Cay",1
+0,16.6955,-88.07483333,"0 - 5 m below low tide level","381-20","Carrie Bow Cay",1
+1,16.6955,-88.07483333,"0 - 5 m below low tide level","382-20","Carrie Bow Cay",1
+1.5,16.11466667,-88.26166667,"0 - 5 m below low tide level","385-20","Nicholas Cay",1
+6.5,16.11466667,-88.26166667,"0 - 5 m below low tide level","386-20","Nicholas Cay",1
+6.5,16.11466667,-88.26166667,"0 - 5 m below low tide level","387-20","Nicholas Cay",1
+0.5,16.29966667,-88.155,"0 - 5 m below low tide level","392-20","Ranguana Cay",1
+0,16.979,-88.0285,"0 - 5 m below low tide level","395-20","Cross Cay",1
+7,16.979,-88.0285,"0 - 5 m below low tide level","396-20","Cross Cay",1
+2.5,16.74493333,-87.80166667,"0 - 5 m below low tide level","BETA-89831","Glover's Reef",1
+4.5,16.74493333,-87.80166667,"0 - 5 m below low tide level","BETA-87920","Glover's Reef",1
+6,16.74493333,-87.80166667,"0 - 5 m below low tide level","BETA-87921","Glover's Reef",1
+2,16.78503333,-87.8313,"0 - 5 m below low tide level","BETA-89832","Glover's Reef",1
+3,16.78503333,-87.8313,"< MTL","BETA-89833","Glover's Reef",1
+4.5,17.32776667,-87.78701833,"< MTL","BETA-96587","Turneffe Island",1
+1,17.54334,-87.79733,"0 - 5 m below low tide level","BETA-96645","Turneffe Island",1
+4,17.225095,-87.52871,"0 - 5 m below low tide level","BETA-98360","Lighthouse Reef",1
+7,17.17014667,-87.89780667,"MTL to HAT","BETA-171884","Turneffe Island",1
+7,17.37716667,-87.576,"MTL to HAT","BETA-171885","Lighthouse Reef",1
+7.5,17.37333333,-87.53333333,"MTL to HAT","BETA-117889","Lighthouse Reef",1
+7.5,17.33966667,-87.52316667,"MTL to HAT","BETA-117890","Lighthouse Reef",1
+5,16.90983333,-88.08,"0 - 5 m below low tide level","BBR 1-2.8","Tobacco Cay",1
+5,17.06933333,-87.99283333,"0 - 5 m below low tide level","BBR 2-2.0","Emily",1
+6.5,17.22616667,-88.04766667,"0 - 5 m below low tide level","BBR 3-3.5","Rendezvous Cay",1
+7.5,17.22616667,-88.04766667,"0 - 5 m below low tide level","BBR 3-8.4","Rendezvous Cay",1
+3.5,17.47933333,-88.042,"0 - 5 m below low tide level","BBR 4-1.7","Gallow's Point Reef",1
+6.5,17.47933333,-88.042,"0 - 5 m below low tide level","BBR 4-6.0","Gallow's Point Reef",1
+7.5,17.47933333,-88.042,"0 - 5 m below low tide level","BBR 4-9.3","Gallow's Point Reef",1
+1,16.485,-88.002,"0 - 5 m below low tide level","BBR 5-2.8","Gladden spit",1
+6,16.485,-88.002,"0 - 5 m below low tide level","BBR 5-7.3","Gladden spit",1
+4.5,16.6955,-88.07483333,"0 - 5 m below low tide level","BBR 6-3.2","Carrie Bow Cay",1
+4.5,16.6955,-88.07483333,"0 - 5 m below low tide level","BBR 7-3.0","Carrie Bow Cay",1
+3,16.11466667,-88.26166667,"0 - 5 m below low tide level","BBR 8-2.9","Nicholas Cay",1
+6,16.11466667,-88.26166667,"0 - 5 m below low tide level","BBR 8-8.3","Nicholas Cay",1
+0.5,16.29966667,-88.155,"0 - 5 m below low tide level","BBR 9-2.9","Ranguana Cay",1
+5.5,16.29966667,-88.155,"0 - 5 m below low tide level","BBR 9-10.7","Ranguana Cay",1
+5.5,16.979,-88.0285,"0 - 5 m below low tide level","BBR 10-2.2","Cross Cay",1
+6,16.979,-88.0285,"< MTL","BBR 10-4.2","Cross Cay",1
+7.5,16.979,-88.0285,"0 - 5 m below low tide level","BBR 10-7.0","Cross Cay",1
+5.5,16.979,-88.0285,"0 - 5 m below low tide level","BBR 11-2.0","Cross Cay",1
+6.5,16.979,-88.0285,"0 - 5 m below low tide level","BBR 11-4.4","Cross Cay",1
+7,16.979,-88.0285,"0 - 5 m below low tide level","BBR 11-6.8","Cross Cay",1
+8,17.47933333,-88.042,"0 - 5 m below low tide level","BBR 4-10.8","Gallow's Point Reef",1
+7,16.6955,-88.07483333,"< MTL","BBR 6-12.2","Carrie Bow Cay",1
+6.5,16.6955,-88.07483333,"0 - 5 m below low tide level","BBR 6-8.0","Carrie Bow Cay",1
+6.5,16.6955,-88.07483333,"< MTL","BBR 7-8.9","Carrie Bow Cay",1
+9,16.83795,-87.75508,"MTL to HAT","G5-460/465","Glover's Reef",1
+9,16.8903,-87.77204,"MTL to HAT","G7-base","Glover's Reef",1
+9.5,16.74135,-87.84175,"MTL to HAT","G9-base","Glover's Reef",1
+6.5,17.25384,-87.92925,"MTL to HAT","T4-base","Turneffe Island",1
+5.5,17.38704,-87.91873,"MTL to HAT","T6-base","Turneffe Island",1
+7,17.38002,-87.87405,"MTL to HAT","T7-base","Turneffe Island",1
+3,17.48103,-87.83574,"MTL to HAT","T12-base","Turneffe Island",1
+8,17.39239,-87.52498,"MTL to HAT","L5-base","Lighthouse Reef",1
+7.5,17.15225,-87.61203,"MTL to HAT","L6-base","Lighthouse Reef",1
+6.5,17.1768,-87.89899,"MTL to HAT","BETA-96642","Cay Bokel Island, Turneffe Atoll",1
+4.5,16.74493333,-87.80166667,"< MTL","GR 1-2.1","Glover's Reef",1
+7,16.74493333,-87.80166667,"< MTL","GR 1-6.675","Glover's Reef",1
+7.5,16.74493333,-87.80166667,"< MTL","GR 1-8.275","Glover's Reef",1
+7.5,16.78643333,-87.8623,"< MTL","GR 2-6.575","Glover's Reef",1
+7.5,16.78643333,-87.8623,"< MTL","GR 2-9.55","Glover's Reef",1
+7.5,16.78643333,-87.8623,"< MTL","GR 2-9.8","Glover's Reef",1
+6.5,16.78503333,-87.8313,"< MTL","GR 3-6.95","Glover's Reef",1
+0.5,17.32776667,-87.78701833,"< MTL","TR 4-0.25","Turneffe Island",1
+2.5,17.32776667,-87.78701833,"< MTL","TR 4-1.35","Turneffe Island",1
+6,17.32776667,-87.78701833,"< MTL","TR 4-3.125","Turneffe Island",1
+1,17.54334,-87.79733,"< MTL","TR 5-0.45","Turneffe Island",1
+1,17.54334,-87.79733,"< MTL","TR 5-1.15","Turneffe Island",1
+7.5,17.225095,-87.52871,"< MTL","LR 7-4.9","Lighthouse Reef",1
+8,17.225095,-87.52871,"< MTL","LR 7-6.3","Lighthouse Reef",1
+4.5,17.37716667,-87.576,"< MTL","LR 10-3.775","Lighthouse Reef",1
+4.5,17.37333333,-87.53333333,"< MTL","LR 11-0.6","Lighthouse Reef",1
+5.5,17.37333333,-87.53333333,"< MTL","LR 11-5.4","Lighthouse Reef",1
+4.5,17.4705,-87.48716667,"< MTL","LR 12-2.125","Lighthouse Reef",1
+5,17.4705,-87.48716667,"< MTL","LR 12-2.375","Lighthouse Reef",1
+7,17.4705,-87.48716667,"< MTL","LR 12-5.475","Lighthouse Reef",1
+9.5,17.37333333,-87.53333333,"< MTL","LR 13-8.05","Lighthouse Reef",1
+2,17.33966667,-87.52316667,"< MTL","LR 14-0.475","Lighthouse Reef",1
+6.5,17.33966667,-87.52316667,"< MTL","LR 14-2.675","Lighthouse Reef",1
+4.5,16.90983333,-88.08,"< MTL","BBR 1-2.1","Tobacco Cay",1
+6.5,16.90983333,-88.08,"< MTL","BBR 1-6.425","Tobacco Cay",1
+7,16.90983333,-88.08,"< MTL","BBR 1-10.075","Tobacco Cay",1
+7,16.90983333,-88.08,"< MTL","BBR 1-13.5","Tobacco Cay",1
+7,17.06933333,-87.99283333,"< MTL","BBR 2-3.275","Emily",1
+8,17.06933333,-87.99283333,"< MTL","BBR 2-4.225","Emily",1
+0,17.22616667,-88.04766667,"< MTL","BBR 3-0.425","Rendezvous Cay",1
+2,17.47933333,-88.042,"< MTL","BBR 4-0.75","Gallow's Point Reef",1
+5,17.47933333,-88.042,"< MTL","BBR 4-2.575","Gallow's Point Reef",1
+9,17.47933333,-88.042,"< MTL","BBR 4-11.6","Gallow's Point Reef",1
+0.5,16.485,-88.002,"< MTL","BBR 5-2","Gladden spit",1
+5,16.485,-88.002,"< MTL","BBR 5-3.875","Gladden spit",1
+7,16.485,-88.002,"< MTL","BBR 5-8.25","Gladden spit",1
+8.5,16.485,-88.002,"< MTL","BBR 5-13.925","Gladden spit",1
+0,16.6955,-88.07483333,"< MTL","BBR 6-0.625","Carrie Bow Cay",1
+5,16.6955,-88.07483333,"< MTL","BBR 7-4.95","Carrie Bow Cay",1
+6.5,16.6955,-88.07483333,"< MTL","BBR 7-8","Carrie Bow Cay",1
+7.5,16.11466667,-88.26166667,"< MTL","BBR 8-15.9","Nicholas Cay",1
+7.5,16.11466667,-88.26166667,"< MTL","BBR 8-18.5","Nicholas Cay",1
+7,16.29966667,-88.155,"< MTL","BBR 9-11.45","Ranguana Cay",1
+7,16.29966667,-88.155,"< MTL","BBR 9-13","Ranguana Cay",1
+1,16.831826,-88.105615,"0.027 +/- 0.191 m msl","OS-37476","Twin Cays",1
+4,16.831826,-88.105615,"0.027 +/- 0.191 m msl","OS-40695","Twin Cays",1
+4.5,16.831826,-88.105615,"0.027 +/- 0.191 m msl","OS-40696","Twin Cays",1
+6.5,16.831826,-88.105615,"0.027 +/- 0.191 m msl","OS-37475","Twin Cays",1
+8,16.831826,-88.105615,"0.027 +/- 0.191 m msl","OS-37477","Twin Cays",1
+2.5,17.9405,-87.9559,"MTL to HAT","491","Ambergris Cay",1
+3.5,17.9895,-87.96347,"MTL to HAT","663","Ambergris Cay",1
+5.5,17.9148,-87.9895,"MTL to HAT","465","Ambergris Cay",1
+1,17.33305,-87.78844,"< MTL","TR 4-1.1","Soldier Cay, Turneffe Atoll",1
+2,17.55281,-87.75377,"< MTL","TR 5-2.7","Three Corner Cay, Turneffe Atoll",1
+2.5,16.78564,-87.8303,"< MTL","TR 4-1.1","Glover's Reef",1
+2.5,16.74667,-87.80076,"< MTL","TR 5-2.7","Glover's Reef",1
+3,16.78564,-87.8303,"< MTL","GR 3-1.25","Glover's Reef",1
+3.5,17.21307,-87.53128,"< MTL","LR 7-2","Lighthouse Reef",1
+4,17.21307,-87.53128,"< MTL","LR 7-3.5","Lighthouse Reef",1
+4,17.21307,-87.53128,"< MTL","LR 7-5.1","Lighthouse Reef",1
+4.5,17.33305,-87.78844,"< MTL","TR 4-3","Soldier Cay, Turneffe Atoll",1
+4.5,16.74667,-87.80076,"< MTL","LR 7-5.1","Glover's Reef",1
+5,16.77432,-87.86298,"< MTL","TR 4-3","Glover's Reef",1
+6,16.77432,-87.86298,"< MTL","GR 1-2.8","Glover's Reef",1
+6.5,16.74667,-87.80076,"< MTL","GR 2-4.6","Glover's Reef",1
+6.5,17.21307,-87.53128,"< MTL","LR 7-7.9","Lighthouse Reef",1
+6.5,16.74667,-87.80076,"< MTL","GR 1-5.6","Glover's Reef",1
+7.5,16.77432,-87.86298,"< MTL","LR 7-7.9","Glover's Reef",1
+6,16.6955,-88.07483333,"< MTL","BBR 6-7.6","Carrie Bow Cay",1
+6,16.6955,-88.07483333,"< MTL","BBR 7-6.4","Carrie Bow Cay",1
+6.5,16.90983333,-88.08,"< MTL","BBR 1-8.1","Tobacco Cay",1
+6.5,17.06933333,-87.99283333,"< MTL","BBR 2-4.4","Emily",1
+7,16.11466667,-88.26166667,"< MTL","BBR 8-14.5","Nicholas Cay",1
+7,16.29966667,-88.155,"< MTL","BBR 9-15.5","Ranguana Cay",1
+7.5,16.90983333,-88.08,"< MTL","BBR 1-13.9","Tobacco Cay",1
+8,16.485,-88.002,"< MTL","BBR 5-14.0","Gladden spit",1
+8,17.22616667,-88.04766667,"0 - 5 m below low tide level","BBR 3-20.0","Rendezvous Cay",1
+8,16.29966667,-88.155,"< MTL","BBR 9-19.8","Ranguana Cay",1
+8,16.11466667,-88.26166667,"< MTL","BBR 8-20.0","Nicholas Cay",1
+2,16.83795,-87.75508,"< MTL","G5-120/125","Glover's Reef",1
+3,16.83795,-87.75508,"< MTL","G5-240/245","Glover's Reef",1
+5,17.3739,-87.49748,"< MTL","L4-base","Lighthouse Reef",1
+5.5,16.83795,-87.75508,"< MTL","G5-380/385","Glover's Reef",1
+8.5,17.25859,-87.88834,"> MTL","T5-base","Turneffe Island",1
+8,16.77466,-87.81556,"< MTL","G4-base","Glover's Reef",1
+11.5,16.83795,-87.75508,"> MTL","G5-base","Glover's Reef",1
+5.5,17.32531,-87.84138,"> MTL","T9-base","Turneffe Island",1
+2,16.902127,-88.08683,"MTL to HAT","Beta-22919","Tobacco Range",1
+2.5,16.901508,-88.086359,"MTL to HAT","Beta-22916","Tobacco Range",1
+2.5,16.896892,-88.082872,"MTL to HAT","Beta-22923","Tobacco Range",1
+3,16.901508,-88.086359,"MTL to HAT","Beta-22917","Tobacco Range",1
+3.5,16.907414,-88.08148,"MTL to HAT","Beta-22936","Tobacco Range",1
+4,16.899691,-88.084984,"MTL to HAT","Beta-31605","Tobacco Range",1
+4,16.902127,-88.08683,"MTL to HAT","Beta-22920","Tobacco Range",1
+5.5,16.896892,-88.082872,"MTL to HAT","Beta-22924","Tobacco Range",1
+6.5,16.902127,-88.08683,"MTL to HAT","Beta-22921","Tobacco Range",1
+6.5,16.904141,-88.088323,"MTL to HAT","Beta-22929","Tobacco Range",1
+6.5,16.90365,-88.087999,"MTL to HAT","Beta-22926","Tobacco Range",1
+6.5,16.899691,-88.084984,"MTL to HAT","Beta-31606","Tobacco Range",1
+6.5,16.902874,-88.08738,"MTL to HAT","Beta-22932","Tobacco Range",1
+7,16.90365,-88.087999,"MTL to HAT","Beta-22927","Tobacco Range",1
+7,16.896892,-88.082872,"MTL to HAT","Beta-22925","Tobacco Range",1
+7,16.90365,-88.087999,"MTL to HAT","Beta-22928","Tobacco Range",1
+7,16.904141,-88.088323,"MTL to HAT","Beta-22930","Tobacco Range",1
+7.5,16.902127,-88.08683,"MTL to HAT","Beta-22922","Tobacco Range",1
+7.5,16.907414,-88.08148,"MTL to HAT","Beta-22937","Tobacco Range",1
+7.5,16.902874,-88.08738,"MTL to HAT","Beta-22933","Tobacco Range",1
+8,16.902874,-88.08738,"MTL to HAT","Beta-22934","Tobacco Range",1
+8,16.901508,-88.086359,"MTL to HAT","Beta-22918","Tobacco Range",1
+8,16.904141,-88.088323,"MTL to HAT","Beta-22931","Tobacco Range",1
+1,16.830427,-88.098941,"0.027 +/- 0.191 m msl","20180","Twin Cays",1
+1,16.835852,-88.103607,"< MTL","10-115-125","Twin Cays",1
+1,16.830427,-88.098941,"< MTL","34790","Twin Cays",1
+3,16.827442,-88.105276,"0.027 +/- 0.191 m msl","6-200-216","Twin Cays",1
+2,16.829922,-88.098336,"< MTL","12-90-100","Twin Cays",1
+2,16.829922,-88.098336,"< MTL","12-190-200","Twin Cays",1
+3,16.823118,-88.105349,"0.027 +/- 0.191 m msl","1C-60","Twin Cays",1
+4,16.834795,-88.10395,"0.027 +/- 0.191 m msl","32933","Twin Cays",1
+4,16.824409,-88.105068,"0.027 +/- 0.191 m msl","1A-128","Twin Cays",1
+3,16.829136,-88.107392,"< MTL","16-138-148","Twin Cays",1
+4.5,16.833215,-88.107582,"0.027 +/- 0.191 m msl","45703","Twin Cays",1
+3.5,16.829922,-88.098336,"< MTL","12-290-300","Twin Cays",1
+4,16.829136,-88.107392,"< MTL","16-300-310","Twin Cays",1
+5,16.834778,-88.10474,"0.027 +/- 0.191 m msl","15-250-270","Twin Cays",1
+4,16.830536,-88.101026,"< MTL","14-490-500","Twin Cays",1
+4.5,16.823744,-88.105482,"< MTL","1B-237","Twin Cays",1
+6,16.833278,-88.108154,"0.027 +/- 0.191 m msl","9-200-220","Twin Cays",1
+6,16.8363,-88.103443,"0.027 +/- 0.191 m msl","11-190-210","Twin Cays",1
+6.5,16.834778,-88.10474,"0.027 +/- 0.191 m msl","15-500-520","Twin Cays",1
+6.5,16.823118,-88.105349,"0.027 +/- 0.191 m msl","1C-425","Twin Cays",1
+7,16.832209,-88.106094,"0.027 +/- 0.191 m msl","7-250-270","Twin Cays",1
+7,16.833278,-88.108154,"0.027 +/- 0.191 m msl","9-350-370","Twin Cays",1
+7,16.833215,-88.107582,"0.027 +/- 0.191 m msl","2-210","Twin Cays",1
+7,16.823118,-88.105349,"0.027 +/- 0.191 m msl","1C-555","Twin Cays",1
+7,16.824409,-88.105068,"0.027 +/- 0.191 m msl","1A-350","Twin Cays",1
+7,16.833215,-88.107582,"0.027 +/- 0.191 m msl","2-204","Twin Cays",1
+7,16.823744,-88.105482,"0.027 +/- 0.191 m msl","1B-360","Twin Cays",1
+7,16.824409,-88.105068,"0.027 +/- 0.191 m msl","1A-355","Twin Cays",1
+7,16.832209,-88.106094,"0.027 +/- 0.191 m msl","7-500-520","Twin Cays",1
+7,16.824409,-88.105068,"0.027 +/- 0.191 m msl","1A-420","Twin Cays",1
+7.5,16.829136,-88.107392,"0.027 +/- 0.191 m msl","16-630-644","Twin Cays",1
+7.5,16.834795,-88.10395,"0.027 +/- 0.191 m msl","3-260","Twin Cays",1
+7.5,16.832209,-88.106094,"0.027 +/- 0.191 m msl","7-693-713","Twin Cays",1
+8,16.827442,-88.105276,"0.027 +/- 0.191 m msl","6-620-640","Twin Cays",1
+8,16.834778,-88.10474,"0.027 +/- 0.191 m msl","15-690-709","Twin Cays",1
+8,16.824409,-88.105068,"0.027 +/- 0.191 m msl","1A-518","Twin Cays",1
+7,17.93425,-88.14624,"MTL to HAT","Geochron BS30-5.3","Bulkhead",1
+0.5,17.86761,-88.04587,"< MTL","Geochron 22-1","Cangrejo",1
+2,17.86815,-88.05989,"< MTL","Geochron 14-4","Cangrejo",1
+2.5,17.87431,-88.04948,"< MTL","Geochron 7-3","Cangrejo",1
+2.5,17.8657,-88.05373,"< MTL","Geochron 16-4","Cangrejo",1
+3,17.96957,-88.0861,"MTL to HAT","Geochron BS44-.9","Bulkhead",1
+5,17.8657,-88.05373,"< MTL","Geochron 16-5.4","Cangrejo",1
+5,17.86995,-88.04873,"< MTL","Geochron 9-5.4","Cangrejo",1
+5.5,17.97122,-88.08158,"MTL to HAT","Geochron BS8-1.6","Bulkhead",1
+6,17.93425,-88.14624,"MTL to HAT","Geochron BS30-3.8","Bulkhead",1
+6.5,17.86761,-88.04587,"MTL to HAT","Geochron 22-3.9","Cangrejo",1
+6.5,17.87431,-88.04948,"MTL to HAT","Geochron 7-4.9","Cangrejo",1
+6.5,17.94833,-88.12242,"MTL to HAT","Geochron BS42-3.4","Bulkhead",1
+7,17.93758,-88.07111,"MTL to HAT","Geochron BS25A-4.3","Bulkhead",1
+7,17.97122,-88.08158,"MTL to HAT","Geochron BS8-3.2","Bulkhead",1
+1,17.30281,-87.83093,"MTL to HAT","Beta-234828","Turneffe Island",1
+1.5,17.30281,-87.83093,"< MTL","WHOI-63006","Turneffe Island",1
+5,17.30281,-87.83093,"< MTL","WHOI-63028","Turneffe Island",1
+5.5,17.30281,-87.83093,"MTL to HAT","Beta-234830","Turneffe Island",1
+6.5,17.30281,-87.83093,"MTL to HAT","Beta-234829","Turneffe Island",1
+0.5,16.829843,-88.105838,"0.027 +/- 0.191 m msl","TC-SSA","Twin Cays",1
+1,16.829215,-88.106504,"0.027 +/- 0.191 m msl","TC5-8B","Twin Cays",1
+1,16.661201,-88.183934,"MTL to HAT","CC10-7","Cat Cay",1
+1,16.831119,-88.101389,"0.027 +/- 0.191 m msl","TC9-6B","Twin Cays",1
+1.5,16.830873,-88.107373,"0.027 +/- 0.191 m msl","TC-REU 1-8","Twin Cays",1
+2.5,16.830817,-88.101729,"0.027 +/- 0.191 m msl","TC8-26B","Twin Cays",1
+2.5,16.830817,-88.101729,"0.027 +/- 0.191 m msl","TC8-14B","Twin Cays",1
+3,16.831119,-88.101389,"0.027 +/- 0.191 m msl","TC9-19","Twin Cays",1
+4,16.830873,-88.107373,"0.027 +/- 0.191 m msl","TC-REU 1-32","Twin Cays",1
+4.5,16.829215,-88.106504,"0.027 +/- 0.191 m msl","TC5-35B","Twin Cays",1
+5.5,16.830754,-88.105715,"0.027 +/- 0.191 m msl","TC3-36B","Twin Cays",1
+7,16.829215,-88.106504,"0.027 +/- 0.191 m msl","TC5-65B","Twin Cays",1
+7,16.830817,-88.101729,"0.027 +/- 0.191 m msl","TC8-85B","Twin Cays",1
+7,16.830873,-88.107373,"0.027 +/- 0.191 m msl","TC-REU 1-64","Twin Cays",1
+7,16.830754,-88.105715,"0.027 +/- 0.191 m msl","TC3-64B","Twin Cays",1
+7.5,16.830873,-88.107373,"0.027 +/- 0.191 m msl","TC-REU 1-82","Twin Cays",1
+7.5,16.829215,-88.106504,"0.027 +/- 0.191 m msl","TC5-100B","Twin Cays",1
+7.5,16.830754,-88.105715,"0.027 +/- 0.191 m msl","TC3-80B","Twin Cays",1
+0.5,17.4179,-88.06963,"MTL to HAT","OS-58900","Spanish Lookout Cay",1
+1,17.4179,-88.06963,"MTL to HAT","OS-55440","Spanish Lookout Cay",1
+1,17.4179,-88.06963,"MTL to HAT","OS-58742","Spanish Lookout Cay",1
+2.5,17.4179,-88.06963,"MTL to HAT","OS-55648","Spanish Lookout Cay",1
+6.5,17.4179,-88.06963,"MTL to HAT","OS-58890","Spanish Lookout Cay",1
+6.5,17.4179,-88.06963,"MTL to HAT","OS-59240","Spanish Lookout Cay",1
+7,17.4179,-88.06963,"MTL to HAT","OS-55416","Spanish Lookout Cay",1
+5,17.4179,-88.06963,"MTL to HAT","OS-59247","Spanish Lookout Cay",1
+8,17.4179,-88.06963,"MTL to HAT","OS-55649","Spanish Lookout Cay",1
+0.5,16.829924,-88.105889,"0.027 +/- 0.191 m msl","OS-42359","Twin Cays",1
+3.5,16.829924,-88.105889,"0.027 +/- 0.191 m msl","OS-54559","Twin Cays",1
+5.5,16.829924,-88.105889,"0.027 +/- 0.191 m msl","OS-54558","Twin Cays",1
+6,16.829924,-88.105889,"0.027 +/- 0.191 m msl","OS-40701","Twin Cays",1
+7,16.829924,-88.105889,"0.027 +/- 0.191 m msl","OS-40700","Twin Cays",1
+7,16.829924,-88.105889,"0.027 +/- 0.191 m msl","OS-40699","Twin Cays",1
+7.5,16.829924,-88.105889,"0.027 +/- 0.191 m msl","OS-40698","Twin Cays",1
+8,16.829924,-88.105889,"0.027 +/- 0.191 m msl","OS-40697","Twin Cays",1
+2.5,17.441901,-87.839003,"MTL to HAT","OS-65273","Turneffe Atoll",1
+4,17.441901,-87.839003,"MTL to HAT","OS-65271","Turneffe Atoll",1
+4.5,17.441901,-87.839003,"MTL to HAT","OS-66026","Turneffe Atoll",1
+6,17.441901,-87.839003,"< MTL","OS-65272","Turneffe Atoll",1
