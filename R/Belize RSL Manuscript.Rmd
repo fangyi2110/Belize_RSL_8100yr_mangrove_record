@@ -2597,7 +2597,7 @@ p=ggplot(data=IESL)+
   labs(x='Age (kyrs BP)',y='Ice-equivalent sea level (m)') 
 
 p
-ggsave('figures/IESL Global 1ka delay.pdf',p,height=4,width=6)
+ggsave('figures/GIA/IESL Global 1ka delay.pdf',p,height=4,width=6)
 ```
 
 
@@ -2622,7 +2622,7 @@ GIA_TWC = lapply(filelist,loadGIASingleModel) %>% rbindlist() %>% filter(age>=-1
 write.csv(GIA_TWC,'data/GIA/TwinCays/GIA Twin Cays tidy.csv')
 
 # load our record
-GR19C1 = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv') %>% mutate(data='GR19C1')
+GR19C1 = read.csv('results/RSL/RSLallages_Bchron_EIVIGPinput.csv') %>% mutate(data='GR19C1')
 
 p_ICE6G = ggplot()+
   # plot our record (full)
@@ -2659,7 +2659,7 @@ p_ANU = ggplot()+
 pGIA = cowplot::plot_grid(p_ICE6G,p_ANU,nrow=2,align='hv')
 pGIA
 
-ggsave('figures/TwinCays GIA comparison.pdf',pGIA,width=7,height=6)
+ggsave('figures/GIA/TwinCays GIA comparison.pdf',pGIA,width=7,height=6)
 
 ```
 
@@ -2739,11 +2739,11 @@ GIA_Belize = bind_rows(GIA_Belize_ICE6G,GIA_Belize_ANU)
 write.csv(GIA_Belize,'data/GIA/BelizeDatabase/GIA Belize tidy.csv')
 
 # load GR19C1
-GR19C1 = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv') %>% mutate(data='GR19C1',
+GR19C1 = read.csv('results/RSL/RSLallages_Bchron_EIVIGPinput.csv') %>% mutate(data='GR19C1',
                                                                                 site=as.factor(4))
 
 # load RSL data
-BelizeDatabase = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality)) %>% rename(site=Tectonic)
+BelizeDatabase = readxl::read_xlsx('data/RSLdatabase/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality)) %>% rename(site=Tectonic)
 
 # tidy for plotting
 scale=1
@@ -2805,7 +2805,7 @@ pGIA_Belize_faceted = ggplot() +
   
 pGIA_Belize_faceted 
 
-ggsave('figures/Belize GIA comparison faceted.pdf',pGIA_Belize_faceted,width=7,height=6.5)
+ggsave('figures/GIA/Belize GIA comparison faceted.pdf',pGIA_Belize_faceted,width=7,height=6.5)
 
 # plo GIA model comparison for whole of Belize colored by region
 pGIA_Belize_ANU = ggplot() +
@@ -2877,7 +2877,7 @@ pGIA_Belize_ICE6G = ggplot() +
 pGIA_Belize = cowplot::plot_grid(pGIA_Belize_ICE6G,pGIA_Belize_ANU,nrow=2,align='hv')
 pGIA_Belize
 
-ggsave('figures/Belize GIA comparison.pdf',pGIA_Belize,width=7,height=6.5)
+ggsave('figures/GIA/Belize GIA comparison.pdf',pGIA_Belize,width=7,height=6.5)
 
 ```
 
@@ -2910,7 +2910,7 @@ GR19C1misfit_ICE6G = ggplot(data=filter(misfit_GR19C1,
                                         grepl('ICE-6G',misfit_GR19C1$model)==TRUE  & grepl('Ant',misfit_GR19C1$variation)==FALSE)) +
   geom_bar(aes(x=variation,y=chi,fill=variation),stat='identity') +
   theme_classic() +
-  scale_y_continuous(limits=c(0,ceiling(misfit_GR19C1$chi))) +
+  scale_y_continuous(limits=c(0,max(ceiling(misfit_GR19C1$chi)))) +
   scale_fill_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')
 
 GR19C1misfit_ICE6G
@@ -2919,13 +2919,13 @@ GR19C1misfit_ANU = ggplot(data=filter(misfit_GR19C1,
                                       grepl('ANU',misfit_GR19C1$model)==TRUE & grepl('Ant',misfit_GR19C1$variation)==FALSE)) +
   geom_bar(aes(x=variation,y=chi,fill=variation),stat='identity') +
   theme_classic()+
-  scale_y_continuous(limits=c(0,ceiling(misfit_GR19C1$chi))) +
+  scale_y_continuous(limits=c(0,max(ceiling(misfit_GR19C1$chi)))) +
   scale_fill_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')
 
 GR19C1misfit_ANU
 
-ggsave('figures/GR19C1misfit_ICE6G.pdf',GR19C1misfit_ICE6G,height=5,width=6)
-ggsave('figures/GR19C1misfit_ANU.pdf',GR19C1misfit_ANU,height=5,width=6)
+ggsave('figures/GIA/GR19C1misfit_ICE6G.pdf',GR19C1misfit_ICE6G,height=5,width=6)
+ggsave('figures/GIA/GR19C1misfit_ANU.pdf',GR19C1misfit_ANU,height=5,width=6)
 
 
 ```
@@ -2945,7 +2945,7 @@ Belize_misfit = ggplot(data=misfit_Belize) +
 
 Belize_misfit
 
-ggsave('figures/Belize_misfit.pdf',Belize_misfit,height=4,width=7)
+ggsave('figures/GIA/Belize_misfit.pdf',Belize_misfit,height=4,width=7)
 
 ```
 
