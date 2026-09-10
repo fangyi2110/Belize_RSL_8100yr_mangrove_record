@@ -2969,15 +2969,15 @@ misfit_GR19C1
 ```{r load EST-GP model results}
 
 # load RSL and rate outputs
-ESTGP_RSL=read.csv('results/Erica STeHM/Belize_TwoComponents/RSL.csv')
-ESTGP_Rates = read.csv('results/Erica STeHM/Belize_TwoComponents/RSLrates.csv')
+ESTGP_RSL=read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSL.csv')
+ESTGP_Rates = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSLrates.csv')
 
 # load global RSL and rate simulated samples 
-ESTGP_RSL_global_samples = read.csv('results/Erica STeHM/Belize_TwoComponents/GlobalRSL_samples.csv')
-ESTGP_Rates_global_samples = read.csv('results/Erica STeHM/Belize_TwoComponents/GlobalRates_samples.csv')
+ESTGP_RSL_global_samples = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/GlobalRSL_samples.csv')
+ESTGP_Rates_global_samples = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/GlobalRates_samples.csv')
 
 # cut to time span of Belize SLIPs
-BelizeSLIPs = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality)) %>% filter(Type==0)
+BelizeSLIPs = readxl::read_xlsx('data/RSLdatabase/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality)) %>% filter(Type==0)
 ESTGP_RSL = filter(ESTGP_RSL,yearBP <= max(BelizeSLIPs$Age))
 ESTGP_Rates = filter(ESTGP_Rates,yearBP <= max(BelizeSLIPs$Age))
 ESTGP_RSL_global_samples = filter(ESTGP_RSL_global_samples, yearBP <= max(BelizeSLIPs$Age)) 
@@ -3042,8 +3042,8 @@ p1=ggplot() +
                   group=modelID,fill=model_ranking,color=model_ranking),alpha=0.3,linetype='dashed')+
   theme_classic() +
   scale_x_reverse() +
-  scale_color_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_fill_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
+  scale_color_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
+  scale_fill_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
   ggtitle('Global') +
   labs(x='Age (yrs BP)',y='RSL (m)')
 
@@ -3066,14 +3066,14 @@ p2 = ggplot() +
               alpha=0.3,linetype='dashed')+
   theme_classic() +
   scale_x_reverse() +
-  scale_color_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_fill_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
+  scale_color_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
+  scale_fill_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
   labs(x='Age (yrs BP)',y='RSL rate (mm/yr)')
 
 p=cowplot::plot_grid(p1,p2,nrow=2,align='hv')
 p
 
-ggsave('figures/ESTGP_compare_ensemble_global.pdf',p,height=5,width=5)
+ggsave('figures/RSLmodels/ESTGP_compare_ensemble_global.pdf',p,height=5,width=5)
 
 # Plot Full
 p1=ggplot() +
@@ -3094,8 +3094,8 @@ p1=ggplot() +
                   group=modelID,fill=model_ranking,color=model_ranking),alpha=0.3,linetype='dashed')+
   theme_classic() +
   scale_x_reverse() +
-  scale_color_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_fill_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
+  scale_color_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
+  scale_fill_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
   ggtitle('Full') +
   labs(x='Age (yrs BP)',y='RSL (m)')+
   facet_wrap(~siteID,ncol=4,labeller = as_labeller(facet_labels))
@@ -3119,15 +3119,15 @@ p2 = ggplot() +
               alpha=0.3,linetype='dashed')+
   theme_classic() +
   scale_x_reverse() +
-  scale_color_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_fill_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
+  scale_color_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
+  scale_fill_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
   labs(x='Age (yrs BP)',y='RSL rate (mm/yr)')+
   facet_wrap(~siteID,ncol=4,labeller = as_labeller(facet_labels))
 
 p=cowplot::plot_grid(p1,p2,nrow=2,align='hv')
 p
 
-ggsave('figures/ESTGP_compare_ensemble_full.pdf',p,height=8,width=10)
+ggsave('figures/RSLmodels/ESTGP_compare_ensemble_full.pdf',p,height=8,width=10)
 
 # Plot Local
 p1=ggplot() +
@@ -3148,8 +3148,8 @@ p1=ggplot() +
                   group=modelID,fill=model_ranking,color=model_ranking),alpha=0.3,linetype='dashed')+
   theme_classic() +
   scale_x_reverse() +
-  scale_color_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_fill_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
+  scale_color_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
+  scale_fill_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
   ggtitle('Local') +
   labs(x='Age (yrs BP)',y='RSL (m)')+
   facet_wrap(~siteID,ncol=4,labeller = as_labeller(facet_labels))
@@ -3173,262 +3173,28 @@ p2 = ggplot() +
               alpha=0.3,linetype='dashed')+
   theme_classic() +
   scale_x_reverse() +
-  scale_color_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_fill_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
+  scale_color_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
+  scale_fill_hawaii(discrete=TRUE,reverse=FALSE,scale_name='hawaii')+
   labs(x='Age (yrs BP)',y='RSL rate (mm/yr)')+
   facet_wrap(~siteID,ncol=4,labeller = as_labeller(facet_labels))
 
 p=cowplot::plot_grid(p1,p2,nrow=2,align='hv')
 p
 
-ggsave('figures/ESTGP_compare_ensemble_local.pdf',p,height=8,width=10)
+ggsave('figures/RSLmodels/ESTGP_compare_ensemble_local.pdf',p,height=8,width=10)
 
 ```
-
-We compare the global RSL component (which accounts for the primary regional trend, mostly from GIA), against GIA models (Figure 3 of manuscript).
-
-To account for model structural uncertainty, we simulate 1000 samples of the global RSL component across all optimal models, then derived summary statistics across the optimal model ensemble. We exclude the non-optimal models as the results are non-intuitive. 
-
-```{r visualise EST-GP global RSL and rate samples}
-
-p1 = ggplot(data=filter(ESTGP_RSL_global_samples,model_ranking!=2)) +
-  geom_density_ridges_gradient(aes(x=RSL/1000,y=yearBP,group=yearBP,fill = ..x..),
-                               scale=3,rel_min_height=0.01,alpha=0.5) + 
-  scale_fill_viridis_c(option = "C") +
-  scale_y_reverse()+
-  theme_classic() +
-  labs(x='RSL (m)',y="Year (BP)") +
-  coord_flip()
-
-p2 = ggplot(data=filter(ESTGP_Rates_global_samples,model_ranking!=2)) +
-  geom_density_ridges_gradient(aes(x=rate,y=yearBP,group=yearBP,fill = ..x..),
-                               scale=3,rel_min_height=0.01,alpha=0.5) + 
-  geom_vline(aes(xintercept=8),linetype='dashed')+
-  scale_fill_viridis_c(option = "C") +
-  scale_y_reverse()+
-  scale_x_continuous(limits=c(-10,25))+
-  theme_classic() +
-  labs(x='RSL rate (mm/yr)',y="Year (BP)") +
-  coord_flip()
-
-cowplot::plot_grid(p1,p2,nrow=2,align='hv')
-
-# for manuscript text
-optimalensemblelength = length(unique(filter(ESTGP_RSL_global_samples,model_ranking!=2)$modelID))
-paste('The ensemble results summarises the predicted samples from',optimalensemblelength,'models.')
-```
-
-As the RSL distributions appear skewed in the earlier part of the record, we tested the influence of two different summary methods: 
-
-1. 95% Highest Density Region
-2. Quantiles (this assumes the data follows a normal distribution)
-
-We find the summary results are similar regardless of the method used.
-
-```{r compare global ESTGP optimal ensemble summary methods}
-
-ESTGP_RSL_global_samples_summary = ESTGP_RSL_global_samples %>% filter(model_ranking!=2) %>% group_by(yearBP) %>% 
-  summarise(median=median(RSL)/1000,
-            upr=max(hdrcde::hdr(RSL,prob=95)$hdr)/1000,
-            lwr=min(hdrcde::hdr(RSL,prob=95)$hdr)/1000) %>% mutate(summary_method='95% HDR')
-
-ESTGP_Rates_global_samples_summary = ESTGP_Rates_global_samples  %>% filter(model_ranking!=2) %>% group_by(yearBP) %>%
-  summarise(median=median(rate),
-            upr=max(hdrcde::hdr(rate,prob=95)$hdr),
-            lwr=min(hdrcde::hdr(rate,prob=95)$hdr)) %>% mutate(summary_method='95% HDR')
-
-p1 = ggplot() +
-  geom_density_ridges_gradient(data=filter(ESTGP_RSL_global_samples,model_ranking!=2),
-                               aes(x=RSL/1000,y=yearBP,group=yearBP,fill = ..x..),
-                               scale=3,rel_min_height=0.01,alpha=0.1) + 
-  geom_path(data=ESTGP_RSL_global_samples_summary,
-            aes(x=median,y=yearBP),color='lightskyblue') +
-  geom_ribbon(data=ESTGP_RSL_global_samples_summary,
-              aes(xmin=lwr,xmax=upr,y=yearBP),alpha=0.65,fill='lightskyblue') +
-  scale_fill_viridis_c(option = "C") +
-  scale_y_reverse()+
-  theme_classic() +
-  labs(x='RSL (m)',y="Year (BP)") +
-  coord_flip() +
-  ggtitle('Summarised with 95% HDR')
-
-p2 = ggplot() +
-  geom_density_ridges_gradient(data=filter(ESTGP_Rates_global_samples,model_ranking!=2),
-                               aes(x=rate,y=yearBP,group=yearBP,fill = ..x..),
-                               scale=3,rel_min_height=0.01,alpha=0.1) + 
-  geom_path(data=ESTGP_Rates_global_samples_summary,
-            aes(x=median,y=yearBP),color='lightskyblue') +
-  geom_ribbon(data=ESTGP_Rates_global_samples_summary,
-              aes(xmin=lwr,xmax=upr,y=yearBP),alpha=0.65,fill='lightskyblue') +
-  scale_fill_viridis_c(option = "C") +
-  scale_y_reverse()+
-  scale_x_continuous(limits=c(-10,25))+
-  theme_classic() +
-  labs(x='RSL rate (mm/yr)',y="Year (BP)") +
-  coord_flip() 
-
-ESTGP_RSL_global_samples_summary_quantiles = ESTGP_RSL_global_samples  %>% filter(model_ranking!=2) %>% group_by(yearBP) %>%
-  summarise(median=median(RSL)/1000,
-            upr=quantile(RSL,probs=0.025)/1000,
-            lwr=quantile(RSL,probs=0.975)/1000) %>% mutate(summary_method='quantiles')
-
-ESTGP_Rates_global_samples_summary_quantiles = ESTGP_Rates_global_samples  %>% filter(model_ranking!=2) %>% group_by(yearBP) %>%
-  summarise(median=median(rate),
-            upr=quantile(rate,probs=0.025),
-            lwr=quantile(rate,probs=0.975)) %>% mutate(summary_method='quantiles')
-
-p3 = ggplot() +
-  geom_density_ridges_gradient(data=filter(ESTGP_RSL_global_samples,model_ranking!=2),
-                               aes(x=RSL/1000,y=yearBP,group=yearBP,fill = ..x..),
-                               scale=3,rel_min_height=0.01,alpha=0.1) + 
-  geom_path(data=ESTGP_RSL_global_samples_summary_quantiles,
-            aes(x=median,y=yearBP),color='lightskyblue') +
-  geom_ribbon(data=ESTGP_RSL_global_samples_summary_quantiles,
-              aes(xmin=lwr,xmax=upr,y=yearBP),alpha=0.65,fill='lightskyblue') +
-  scale_fill_viridis_c(option = "C") +
-  scale_y_reverse()+
-  theme_classic() +
-  labs(x='RSL (m)',y="Year (BP)") +
-  coord_flip() +
-  ggtitle('Summarised with quantiles')
-
-p4 = ggplot() +
-  geom_density_ridges_gradient(data=filter(ESTGP_Rates_global_samples,model_ranking!=2),
-                               aes(x=rate,y=yearBP,group=yearBP,fill = ..x..),
-                               scale=3,rel_min_height=0.01,alpha=0.1) + 
-  geom_path(data=ESTGP_Rates_global_samples_summary_quantiles,
-            aes(x=median,y=yearBP),color='lightskyblue') +
-  geom_ribbon(data=ESTGP_Rates_global_samples_summary_quantiles,
-              aes(xmin=lwr,xmax=upr,y=yearBP),alpha=0.65,fill='lightskyblue') +
-  scale_fill_viridis_c(option = "C") +
-  scale_y_reverse()+
-  scale_x_continuous(limits=c(-10,25))+
-  theme_classic() +
-  labs(x='RSL rate (mm/yr)',y="Year (BP)") +
-  coord_flip() 
-
-pRSL = ggplot() +
-  geom_path(data=ESTGP_RSL_global_samples_summary_quantiles,
-            aes(x=median,y=yearBP,color=summary_method)) +
-  geom_ribbon(data=ESTGP_RSL_global_samples_summary_quantiles,
-              aes(xmin=lwr,xmax=upr,y=yearBP,fill=summary_method),alpha=0.5) +
-  geom_path(data=ESTGP_RSL_global_samples_summary,
-            aes(x=median,y=yearBP,color=summary_method)) +
-  geom_ribbon(data=ESTGP_RSL_global_samples_summary,
-              aes(xmin=lwr,xmax=upr,y=yearBP,fill=summary_method),alpha=0.5) +
-  scale_color_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_fill_hawaii(discrete = TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_y_reverse()+
-  theme_classic() +
-  labs(x='RSL (m)',y="Year (BP)") +
-  coord_flip() +
-  ggtitle('Global (optimal model ensemble summary)')
-
-pRates = ggplot() +
-  geom_path(data=ESTGP_Rates_global_samples_summary_quantiles,
-            aes(x=median,y=yearBP,color=summary_method)) +
-  geom_ribbon(data=ESTGP_Rates_global_samples_summary_quantiles,
-              aes(xmin=lwr,xmax=upr,y=yearBP,fill=summary_method),alpha=0.5) +
-  geom_path(data=ESTGP_Rates_global_samples_summary,
-            aes(x=median,y=yearBP,color=summary_method)) +
-  geom_ribbon(data=ESTGP_Rates_global_samples_summary,
-              aes(xmin=lwr,xmax=upr,y=yearBP,fill=summary_method),alpha=0.5) +
-  scale_color_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_fill_hawaii(discrete = TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_y_reverse()+
-  scale_x_continuous(limits=c(-10,25))+
-  theme_classic() +
-  labs(x='RSL rate (mm/yr)',y="Year (BP)") +
-  coord_flip() 
-
-p=cowplot::plot_grid(p1,p3,pRSL,p2,p4,pRates,nrow=2,align='hv')
-p
-
-ggsave('figures/ESTGP_compare_global_optimal_ensemble_summarymethods.pdf',p,height=7,width=13)
-
-```
-
-We stick to using the 95% HDR to be theoretically more accurate as the data does not strictly follow a normal distribution.
-
-The optimal model ensemble summary is very similar to the chosen model.
-
-```{r compare global RSL and rates optimal model ensemble to chosen model}
-
-# Summarise model ensemble samples (exclude non-optimal models)
-
-ESTGP_RSL_global_samples_summary = ESTGP_RSL_global_samples %>% filter(model_ranking!=2) %>% group_by(yearBP) %>% 
-  summarise(median=median(RSL)/1000,
-            upr=max(hdrcde::hdr(RSL,prob=95)$hdr)/1000,
-            lwr=min(hdrcde::hdr(RSL,prob=95)$hdr)/1000) %>% mutate(modeltype='optimal ensemble')
-
-ESTGP_Rates_global_samples_summary = ESTGP_Rates_global_samples  %>% filter(model_ranking!=2) %>% group_by(yearBP) %>%
-  summarise(median=median(rate),
-            upr=max(hdrcde::hdr(rate,prob=95)$hdr),
-            lwr=min(hdrcde::hdr(rate,prob=95)$hdr)) %>% mutate(modeltype='optimal ensemble')
-
-# Extract RSL and rate outputs for chosen model only
-ESTGP_RSL_global_chosen = filter(ESTGP_RSL,component==2 & model_ranking==0) %>% 
-  mutate(modeltype='chosen model',RSL=RSL/1000,RSLsd=RSLsd/1000)
-ESTGP_Rates_global_chosen = filter(ESTGP_Rates,component==2 & model_ranking==0) %>% 
-  mutate(modeltype='chosen model',df2s=df2s,dsd2s=dsd2s)
-
-p1 = ggplot() +
-  geom_path(data=ESTGP_RSL_global_chosen,
-            aes(x=yearBP,y=RSL,color=modeltype)) +
-  geom_ribbon(data=ESTGP_RSL_global_chosen,
-              aes(x=yearBP,ymin=RSL-2*RSLsd,ymax=RSL+2*RSLsd,fill=modeltype),alpha=0.5)+
-  geom_path(data=ESTGP_RSL_global_samples_summary,
-            aes(x=yearBP,y=median,color=modeltype)) +
-  geom_ribbon(data=ESTGP_RSL_global_samples_summary,
-              aes(x=yearBP,ymin=lwr,ymax=upr,fill=modeltype),alpha=0.5)+
-  theme_classic() +
-  scale_x_reverse()+
-  scale_color_hawaii(discrete=TRUE,scale_name='hawaii')+
-  scale_fill_hawaii(discrete = TRUE,scale_name='hawaii')+
-  labs(x='Age (yrs BP)',y='RSL (m)') +
-  ggtitle('Global RSL')
-
-p2 = ggplot() +
-  geom_path(data=ESTGP_Rates_global_chosen,
-            aes(x=yearBP,y=df2s,color=modeltype)) +
-  geom_ribbon(data=ESTGP_Rates_global_chosen,
-              aes(x=yearBP,ymin=df2s-2*dsd2s,ymax=df2s+2*dsd2s,fill=modeltype),alpha=0.5)+
-  geom_path(data=ESTGP_Rates_global_samples_summary,
-            aes(x=yearBP,y=median,color=modeltype)) +
-  geom_ribbon(data=ESTGP_Rates_global_samples_summary,
-              aes(x=yearBP,ymin=lwr,ymax=upr,fill=modeltype),alpha=0.5)+
-  theme_classic() +
-  scale_x_reverse()+
-  scale_color_hawaii(discrete=TRUE,scale_name='hawaii')+
-  scale_fill_hawaii(discrete = TRUE,scale_name='hawaii')+
-  labs(x='Age (yrs BP)',y='RSL rate (mm/yr)')
-
-p = cowplot::plot_grid(p1,p2,nrow=2,align='hv')
-p
-
-ggsave('figures/ESTGP_compare_global_chosen_to_full_ensemble.pdf',p,height=5,width=7)
-
-```
-
-Therefore, we use the chosen model in the eventual analysis (Figure 3), comparing to RSL data.
-
-We compare the global component of RSL and rate (based on the optimal ensemble) to the RSL data.
 
 ```{r compare chosen global EST-GP NIspline and EIVIGP models to RSL data}
 
-# factor levels for plotting
-model_colors <- c(
-  'EIV-IGP' = '#9b951bff',
-  'NI spline' = '#b2f2fdff',
-  'EST-GP (global)' = '#8c0172ff'
-)
+model_levels = c('EIV-IGP','EST-GP (global)','NI spline')
 
 
 # load RSL data
-BelizeDatabase = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality))
+BelizeDatabase = readxl::read_xlsx('data/RSLdatabase/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality))
 
 # load our record
-GR19C1 = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv')
+GR19C1 = read.csv('results/RSL/RSLallages_Bchron_EIVIGPinput.csv')
 
 # tidy for plotting
 scale=1.5
@@ -3454,19 +3220,19 @@ terrL$left = terrL$Age-terrL$Age_low_er_2sd # xmin value
 terrL$right = terrL$Age+terrL$Age_up_er_2sd # xmax value
 
 # load NIspline model results for GR19C1
-GR19C1_NIspline = read.csv('results/ReSLR NIspline model outputs/GR19C1 NIspline model nseg14.csv') %>% mutate(model='NI spline') %>% mutate(model=factor(model))
+GR19C1_NIspline = read.csv('results/RSLmodels/ReSLR NIspline model outputs/GR19C1 NIspline model nseg14.csv') %>% mutate(model='NI spline') %>% mutate(model=factor(model))
 
 # load EIV-IGP model results for GR19C1
-GR19C1_EIVIGP = read.csv('results/EIV-IGP model outputs/GR19C1_EIVIGP_defaultsettings.csv') %>% mutate(model='EIV-IGP') %>% mutate(model=factor(model))
+GR19C1_EIVIGP = read.csv('results/RSLmodels/EIV-IGP model outputs/GR19C1_EIVIGP_defaultsettings.csv') %>% mutate(model='EIV-IGP') %>% mutate(model=factor(model))
 
 # load RSL and rate outputs
-ESTGP_RSL_chosen=read.csv('results/Erica STeHM/Belize_TwoComponents/RSL.csv') %>% 
+ESTGP_RSL_chosen=read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSL.csv') %>% 
   filter(component==2 & model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,model='EST-GP (global)') %>%
   mutate(model=factor(model,levels=model_levels))
 
-ESTGP_Rates_chosen = read.csv('results/Erica STeHM/Belize_TwoComponents/RSLrates.csv') %>% 
+ESTGP_Rates_chosen = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSLrates.csv') %>% 
   filter(component==2 & model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(df2s=df2s,dsd2s=dsd2s,model='EST-GP (global)') %>%
@@ -3572,7 +3338,7 @@ p_BelizeRSLrates =
 p_Belize = cowplot::plot_grid(p_BelizeRSL,p_BelizeRSLrates,nrow=2,align='hv')
 p_Belize
 
-ggsave('Figures/Belize RSL compare GR19C1.pdf',p_Belize,height=7,width=6)
+ggsave('Figures/RSLmodels/Belize RSL compare GR19C1.pdf',p_Belize,height=7,width=6)
 
 
 ```
@@ -3600,13 +3366,13 @@ We decompose the RSL trends in Belize into the global, regional and local compon
 
 ```{r plot spatiotemporal decomposition, warning=FALSE}
 # load RSL data
-BelizeDatabase = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),                                        
+BelizeDatabase = readxl::read_xlsx('data/RSLdatabase/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),                                        
                                                                             Quality=as.factor(Quality),
                                                                                 component='Full') %>% mutate(component=factor(component,levels=c('Full','Global','Regional','Local')))
 
 
 # load our record
-GR19C1 = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv') %>% mutate(component='Full') %>% mutate(component=factor(component,levels=c('Full','Global','Regional','Local')))
+GR19C1 = read.csv('results/RSL/RSLallages_Bchron_EIVIGPinput.csv') %>% mutate(component='Full') %>% mutate(component=factor(component,levels=c('Full','Global','Regional','Local')))
 
 # tidy for plotting
 scale=1.5
@@ -3633,8 +3399,8 @@ terrL$right = terrL$Age+terrL$Age_up_er_2sd # xmax value
 
 
 # load RSL and rate outputs from EST-GP model global component
-ESTGP_RSL_chosen = read.csv('results/Erica STeHM/Belize_TwoComponents/RSL.csv') %>% filter(model_ranking==0) %>% filter(yearBP<=max(SLIPs$Age)) %>% mutate(siteID=as.factor(siteID)) %>% mutate(RSL=RSL/1000,RSLsd=RSLsd/1000)
-ESTGP_Rates_chosen = read.csv('results/Erica STeHM/Belize_TwoComponents/RSLrates.csv') %>% filter(model_ranking==0) %>% filter(yearBP<=max(SLIPs$Age)) %>% mutate(siteID=as.factor(siteID))
+ESTGP_RSL_chosen = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSL.csv') %>% filter(model_ranking==0) %>% filter(yearBP<=max(SLIPs$Age)) %>% mutate(siteID=as.factor(siteID)) %>% mutate(RSL=RSL/1000,RSLsd=RSLsd/1000)
+ESTGP_Rates_chosen = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSLrates.csv') %>% filter(model_ranking==0) %>% filter(yearBP<=max(SLIPs$Age)) %>% mutate(siteID=as.factor(siteID))
 
 # rename components to text 
 ESTGP_RSL_chosen <- ESTGP_RSL_chosen %>%
@@ -3721,7 +3487,7 @@ p_rates = ggplot() +
 p_decomp = cowplot::plot_grid(p_RSL,p_rates,nrow=2,align='hv')
 p_decomp
 
-ggsave('Figures/Belize RSL decomposition.pdf',p_decomp,height=6,width=10)
+ggsave('Figures/RSLmodels/Belize RSL decomposition.pdf',p_decomp,height=6,width=10)
 
 
 # manuscript text for contribution from regional and local scale processes
@@ -3737,13 +3503,13 @@ paste('Local scale processes contribute on average',
 ```{r plot spatiotemporal model decomposition by regions Response to Reviewer}
 
 # load RSL data
-BelizeDatabase = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),                                        
+BelizeDatabase = readxl::read_xlsx('data/RSLdatabase/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),                                        
                                                                             Quality=as.factor(Quality),
                                                                                 component='Full') %>% mutate(component=factor(component,levels=c('Full','Global','Regional','Local'))) %>% rename(siteID=Tectonic)
 
 
 # load our record
-GR19C1 = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv') %>% mutate(component='Full',siteID=4) %>% mutate(component=factor(component,levels=c('Full','Global','Regional','Local')))
+GR19C1 = read.csv('results/RSL/RSLallages_Bchron_EIVIGPinput.csv') %>% mutate(component='Full',siteID=4) %>% mutate(component=factor(component,levels=c('Full','Global','Regional','Local')))
 
 # tidy for plotting
 scale=1.5
@@ -3770,8 +3536,8 @@ terrL$right = terrL$Age+terrL$Age_up_er_2sd # xmax value
 
 
 # load RSL and rate outputs from EST-GP model global component
-ESTGP_RSL_chosen = read.csv('results/Erica STeHM/Belize_TwoComponents/RSL.csv') %>% filter(model_ranking==0) %>% filter(yearBP<=max(SLIPs$Age)) %>% mutate(siteID=as.factor(siteID)) %>% mutate(RSL=RSL/1000,RSLsd=RSLsd/1000)
-ESTGP_Rates_chosen = read.csv('results/Erica STeHM/Belize_TwoComponents/RSLrates.csv') %>% filter(model_ranking==0) %>% filter(yearBP<=max(SLIPs$Age)) %>% mutate(siteID=as.factor(siteID))
+ESTGP_RSL_chosen = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSL.csv') %>% filter(model_ranking==0) %>% filter(yearBP<=max(SLIPs$Age)) %>% mutate(siteID=as.factor(siteID)) %>% mutate(RSL=RSL/1000,RSLsd=RSLsd/1000)
+ESTGP_Rates_chosen = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSLrates.csv') %>% filter(model_ranking==0) %>% filter(yearBP<=max(SLIPs$Age)) %>% mutate(siteID=as.factor(siteID))
 
 # rename components to text 
 ESTGP_RSL_chosen <- ESTGP_RSL_chosen %>%
@@ -3876,160 +3642,23 @@ p_rates = ggplot() +
 p=cowplot::plot_grid(p_RSL,p_rates,nrow=2,align='hv')
 p
 
-ggsave('Figures/Belize RSL decomposition by region.pdf',p,height=8,width=8)
+ggsave('Figures/RSLmodels/Belize RSL decomposition by region.pdf',p,height=8,width=8)
 
 ```
 
 
 ## Compare different data inputs for EST-GP (response to Reviewer 3)
 
-Reviewer 3 raised concerns that the continuous core data was combined with SLIPs in a GP model.To answer this we test two variations of the spatiotemporal (EST-GP) model:
-
-1) with the GR/19/C1 core classified as an independent site as the other Twin Cays SLIPs
-2) with the GR/19/C1 core as SLIPs instead of using the age output from the age-depth model
+Reviewer 3 raised concerns that the continuous core data was combined with SLIPs in a GP model.To answer this we tested modelling the GR/19/C1 core as SLIPs instead of using the age output from the age-depth model, as suggested by the reviewer.
 
 We compare the global component as this is the main model component referred to and also comprises most of the signal.
 
-```{r compare EST-GP with GR19C1 core classified as different site or as SLIPs}
-# load RSL data
-BelizeDatabase = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality))
-
-# load our record
-GR19C1 = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv')
-
-# tidy for plotting
-scale=1.5
-
-SLIPs= filter(BelizeDatabase,Type==0)
-SLIPs$upper = SLIPs$RSL + SLIPs$RSL_up_er_2sd # ymax value
-SLIPs$lower = SLIPs$RSL - SLIPs$RSL_low_er_2sd # ymin value
-SLIPs$left = SLIPs$Age - SLIPs$Age_low_er_2sd  # xmin value
-SLIPs$right = SLIPs$Age + SLIPs$Age_up_er_2sd # xmax value
-
-marL=filter(BelizeDatabase,Type==-1)
-marL$upper = marL$RSL - marL$RSL_low_er_2sd # y value of horizontal line
-marL$lower = marL$upper - scale # y value for bottom of tick mark
-marL$xmid = marL$Age
-marL$left = marL$Age-marL$Age_low_er_2sd # xmin value
-marL$right = marL$Age+marL$Age_up_er_2sd # xmax value
-
-terrL=filter(BelizeDatabase,Type==1)
-terrL$lower = terrL$RSL + terrL$RSL_up_er_2sd # y value of horizontal line
-terrL$upper = terrL$lower + scale # y value for top of tick mark
-terrL$xmid = terrL$Age
-terrL$left = terrL$Age-terrL$Age_low_er_2sd # xmin value
-terrL$right = terrL$Age+terrL$Age_up_er_2sd # xmax value
-
-# define factor levels for plotting
-FactorLevels = c('EST-GP (global)','EST-GP (global) split TwinCays','EST-GP (global) GR19C1 as SLIPs')
-
-# load original EST-GP outputs
-ESTGP_RSL=read.csv('results/Erica STeHM/Belize/RSL.csv') %>% 
-  filter(component==2 & model_ranking==0) %>% 
-  filter(yearBP<=max(SLIPs$Age)) %>%
-  mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,
-         model=factor('EST-GP (global)',levels=FactorLevels)) 
-ESTGP_Rates = read.csv('results/Erica STeHM/Belize/RSLrates.csv') %>% 
-  filter(component==2 & model_ranking==0) %>% 
-  filter(yearBP<=max(SLIPs$Age)) %>%
-  mutate(df2s=df2s,dsd2s=dsd2s,
-         model=factor('EST-GP (global)',levels=FactorLevels)) 
-
-# load variation of EST-GP: split GR19C1 as separate site
-ESTGP_RSL_splitTWC=read.csv('results/Erica STeHM/Belize_testSplitTWC/RSL.csv') %>% 
-  filter(component==2 & model_ranking==0) %>% 
-  filter(yearBP<=max(SLIPs$Age)) %>%
-  mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,
-         model=factor('EST-GP (global) split TwinCays',levels=FactorLevels)) 
-ESTGP_Rates_splitTWC = read.csv('results/Erica STeHM/Belize_testSplitTWC/RSLrates.csv') %>% 
-  filter(component==2 & model_ranking==0) %>% 
-  filter(yearBP<=max(SLIPs$Age)) %>%
-  mutate(df2s=df2s,dsd2s=dsd2s,
-         model=factor('EST-GP (global) split TwinCays',levels=FactorLevels)) 
-
-# load variation of EST-GP: treat GR19C1 as SLIPs
-ESTGP_RSL_GR19C1asSLIPs=read.csv('results/Erica STeHM/Belize_testGR19C1asSLIPs/RSL.csv') %>% 
-  filter(component==2 & model_ranking==0) %>% 
-  filter(yearBP<=max(SLIPs$Age)) %>%
-  mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,
-         model=factor('EST-GP (global) GR19C1 as SLIPs',levels=FactorLevels)) 
-ESTGP_Rates_GR19C1asSLIPs = read.csv('results/Erica STeHM/Belize_testGR19C1asSLIPs/RSLrates.csv') %>% 
-  filter(component==2 & model_ranking==0) %>% 
-  filter(yearBP<=max(SLIPs$Age)) %>%
-  mutate(df2s=df2s,dsd2s=dsd2s,
-         model=factor('EST-GP (global) GR19C1 as SLIPs',levels=FactorLevels)) 
-
-# plot global component comparison
-p_BelizeRSL=
-  ggplot()+
-  # plot spatiotemporal model global component (original data)
-  geom_path(data=ESTGP_RSL,
-            aes(y=RSL,x=yearBP,color=model)) +
-  geom_ribbon(data=ESTGP_RSL,
-              aes(ymin=RSL-2*RSLsd,ymax=RSL+2*RSLsd,x=yearBP,fill=model),alpha=0.35) + # 2 sigma
-  # plot spatiotemporal model global component (split GR/19/C1 core from Twin Cays SLIPs)
-  geom_path(data=ESTGP_RSL_splitTWC,
-            aes(y=RSL,x=yearBP,color=model)) +
-  geom_ribbon(data=ESTGP_RSL_splitTWC,
-              aes(ymin=RSL-2*RSLsd,ymax=RSL+2*RSLsd,x=yearBP,fill=model),alpha=0.35) + # 2 sigma
-  # plot spatiotemporal model global component (treat GR/19/C1 core as SLIPs)
-  geom_path(data=ESTGP_RSL_GR19C1asSLIPs,
-            aes(y=RSL,x=yearBP,color=model)) +
-  geom_ribbon(data=ESTGP_RSL_GR19C1asSLIPs,
-              aes(ymin=RSL-2*RSLsd,ymax=RSL+2*RSLsd,x=yearBP,fill=model),alpha=0.35) + # 2 sigma
-  scale_fill_brewer(palette='Dark2')+
-  scale_color_brewer(palette='Dark2')+
-  # scale_color_hawaii(discrete=TRUE) + 
-  # scale_fill_hawaii(discrete = TRUE) +
-  scale_alpha_manual(values=c(0.5,0.1))+
-  labs(x='Age (yrs BP)',y='RSL (m)')+
-  theme_classic()+
-  theme(legend.position = 'top')+
-  scale_x_reverse(breaks=seq(0,13000,1000),limits=c(13500,-100)) +
-  ggtitle('Global component')
-  
- p_BelizeRSLrates =
-  ggplot() +
-  # EST-GP (global model chosen model original)
-  geom_path(data=ESTGP_Rates,
-            aes(y=df2s,x=yearBP,color=model),linewidth=0.8) +
-  geom_ribbon(data=ESTGP_Rates,
-              aes(ymin=df2s-2*dsd2s,ymax=df2s+2*dsd2s,x=yearBP,fill=model),alpha=0.35) + # 2 sigma
-  # EST-GP (global model chosen model split Twin Cays data)
-  geom_path(data=ESTGP_Rates_splitTWC,
-            aes(y=df2s,x=yearBP,color=model),linewidth=0.8) +
-  geom_ribbon(data=ESTGP_Rates_splitTWC,
-              aes(ymin=df2s-2*dsd2s,ymax=df2s+2*dsd2s,x=yearBP,fill=model),alpha=0.35) + # 2 sigma
-   # EST-GP (global model chosen model treat GR19C1 as SLIPs)
-  geom_path(data=ESTGP_Rates_GR19C1asSLIPs,
-            aes(y=df2s,x=yearBP,color=model),linewidth=0.8) +
-  geom_ribbon(data=ESTGP_Rates_GR19C1asSLIPs,
-              aes(ymin=df2s-2*dsd2s,ymax=df2s+2*dsd2s,x=yearBP,fill=model),alpha=0.35) + # 2 sigma
-  theme_classic() +
-  theme(legend.position = 'none') +
-  scale_x_reverse(breaks=seq(0,13000,1000),
-                  limits=c(13500,-100))+
-  scale_y_continuous(breaks=seq(-5,18,3))+
-  scale_fill_brewer(palette='Dark2')+
-  scale_color_brewer(palette='Dark2')+
-  # scale_color_hawaii() +
-  # scale_fill_hawaii() +
-  labs(x="Age (BP)",y="Rate (mm/yr)") 
-
-p_Belize = cowplot::plot_grid(p_BelizeRSL,p_BelizeRSLrates,nrow=2,align='hv')
-p_Belize
-
-ggsave('Figures/ESTGP_compare_inputs_ResponseReviewer3_SplitSitesAndSLIPs.pdf',p_Belize,height=7,width=6)
-```
-
-Since there's no difference when treating the GR/19/C1 core as a separate site than other Twin Cays data, we only include the comparison of the original result vs treating the core as SLIPs in the review response.
-
 ```{r compare EST-GP with GR19C1 core as SLIPs}
 # load RSL data
-BelizeDatabase = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality))
+BelizeDatabase = readxl::read_xlsx('data/RSLdatabase/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality))
 
 # load our record
-GR19C1 = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv')
+GR19C1 = read.csv('results/RSL/RSLallages_Bchron_EIVIGPinput.csv')
 
 # tidy for plotting
 scale=1.5
@@ -4057,25 +3686,25 @@ terrL$right = terrL$Age+terrL$Age_up_er_2sd # xmax value
 # define factor levels for plotting
 FactorLevels = c('EST-GP (global)','EST-GP (global) split TwinCays','EST-GP (global) GR19C1 as SLIPs')
 
-# load original EST-GP outputs
-ESTGP_RSL=read.csv('results/Erica STeHM/Belize/RSL.csv') %>% 
+# load 2-component EST-GP output used in manuscript
+ESTGP_RSL=read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSL.csv') %>% 
   filter(component==2 & model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,
          model=factor('EST-GP (global)',levels=FactorLevels)) 
-ESTGP_Rates = read.csv('results/Erica STeHM/Belize/RSLrates.csv') %>% 
+ESTGP_Rates = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSLrates.csv') %>% 
   filter(component==2 & model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(df2s=df2s,dsd2s=dsd2s,
          model=factor('EST-GP (global)',levels=FactorLevels)) 
 
 # load variation of EST-GP: treat GR19C1 as SLIPs
-ESTGP_RSL_GR19C1asSLIPs=read.csv('results/Erica STeHM/Belize_testGR19C1asSLIPs/RSL.csv') %>% 
+ESTGP_RSL_GR19C1asSLIPs=read.csv('results/RSLmodels/STeHM model outputs/Belize_testGR19C1asSLIPs/RSL.csv') %>% 
   filter(component==2 & model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,
          model=factor('EST-GP (global) GR19C1 as SLIPs',levels=FactorLevels)) 
-ESTGP_Rates_GR19C1asSLIPs = read.csv('results/Erica STeHM/Belize_testGR19C1asSLIPs/RSLrates.csv') %>% 
+ESTGP_Rates_GR19C1asSLIPs = read.csv('results/RSLmodels/STeHM model outputs/Belize_testGR19C1asSLIPs/RSLrates.csv') %>% 
   filter(component==2 & model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(df2s=df2s,dsd2s=dsd2s,
@@ -4096,13 +3725,11 @@ p_BelizeRSL=
               aes(ymin=RSL-2*RSLsd,ymax=RSL+2*RSLsd,x=yearBP,fill=model),alpha=0.35) + # 2 sigma
   scale_fill_brewer(palette='Dark2')+
   scale_color_brewer(palette='Dark2')+
-  # scale_color_hawaii(discrete=TRUE) + 
-  # scale_fill_hawaii(discrete = TRUE) +
   scale_alpha_manual(values=c(0.5,0.1))+
   labs(x='Age (yrs BP)',y='RSL (m)')+
   theme_classic()+
   theme(legend.position = 'top')+
-  scale_x_reverse(breaks=seq(0,13000,1000),limits=c(13500,-100)) +
+  scale_x_reverse(breaks=seq(0,10000,1000),limits=c(10500,-100)) +
   ggtitle('Global component')
   
  p_BelizeRSLrates =
@@ -4119,29 +3746,27 @@ p_BelizeRSL=
               aes(ymin=df2s-2*dsd2s,ymax=df2s+2*dsd2s,x=yearBP,fill=model),alpha=0.35) + # 2 sigma
   theme_classic() +
   theme(legend.position = 'none') +
-  scale_x_reverse(breaks=seq(0,13000,1000),
-                  limits=c(13500,-100))+
+  scale_x_reverse(breaks=seq(0,10000,1000),
+                  limits=c(10500,-100))+
   scale_y_continuous(breaks=seq(-5,18,3))+
   scale_fill_brewer(palette='Dark2')+
   scale_color_brewer(palette='Dark2')+
-  # scale_color_hawaii() +
-  # scale_fill_hawaii() +
   labs(x="Age (BP)",y="Rate (mm/yr)") 
 
 p_Belize = cowplot::plot_grid(p_BelizeRSL,p_BelizeRSLrates,nrow=2,align='hv')
 p_Belize
 
-ggsave('Figures/ESTGP_compare_inputs_ResponseReviewer3_SLIPs.pdf',p_Belize,height=7,width=6)
+ggsave('Figures/RSLmodels/ESTGP_compare_inputs_ResponseReviewer3_SLIPs.pdf',p_Belize,height=6,width=6)
 ```
 
 ```{r plot decomposition of model using SLIPs approach treating GR19C1 as SLIPs)}
 
 # load model results
-ESTGP_RSL_GR19C1asSLIPs=read.csv('results/Erica STeHM/Belize_testGR19C1asSLIPs/RSL.csv') %>% 
+ESTGP_RSL_GR19C1asSLIPs=read.csv('results/RSLmodels/STeHM model outputs/Belize_testGR19C1asSLIPs/RSL.csv') %>% 
   filter(model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(RSL=RSL/1000,RSLsd=RSLsd/1000) %>% mutate(siteID=as.factor(siteID))
-ESTGP_Rates_GR19C1asSLIPs = read.csv('results/Erica STeHM/Belize_testGR19C1asSLIPs/RSLrates.csv') %>% 
+ESTGP_Rates_GR19C1asSLIPs = read.csv('results/RSLmodels/STeHM model outputs/Belize_testGR19C1asSLIPs/RSLrates.csv') %>% 
   filter(model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(df2s=df2s,dsd2s=dsd2s) %>% mutate(siteID=as.factor(siteID))
@@ -4171,7 +3796,7 @@ p_RSL=ggplot()+
   labs(x='Age (kyrs BP)',y='RSL (m)')+
   theme_classic()+
   theme(legend.position = 'none')+
-  scale_x_reverse(breaks=seq(0,13,10),limits=c(13.5,-0.1)) +
+  scale_x_reverse(breaks=seq(0,10,1),limits=c(10,-0.1)) +
   facet_wrap(~component,nrow=1)+
   ggtitle('RSL decomposition')
 
@@ -4187,26 +3812,27 @@ p_rates=ggplot()+
   labs(x='Age (kyrs BP)',y='Rates (mm/yr)')+
   theme_classic()+
   theme(legend.position = 'none')+
-  scale_x_reverse(breaks=seq(0,13,10),limits=c(12.5,-0.1)) +
+  scale_x_reverse(breaks=seq(0,10,1),limits=c(10,-0.1)) +
   facet_wrap(~component,nrow=1)
 
 p=cowplot::plot_grid(p_RSL,p_rates,nrow=2,align='hv')
 p
 
-ggsave('Figures/ESTGP_decomposition_GR19C1asSLIPs_ResponseReviewer3.pdf',p,height=7,width=6)
+ggsave('Figures/RSLmodels/ESTGP_decomposition_GR19C1asSLIPs_ResponseReviewer3.pdf',p,height=6,width=8)
 
 ```
+
 ## Compare simplified model structure (Two Components)
 
-In response to Reviewer 3, we collapsed the regional and local kernels into one.
+In response to Reviewer 3, we collapsed the originally submitted regional and local kernels in the three-component model into one, deriving a two-component model.
 
-```{r compare EST-GP with two components}
+```{r compare EST-GP with two and three components}
 
 # load RSL data
-BelizeDatabase = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality))
+BelizeDatabase = readxl::read_xlsx('data/RSLdatabase/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality))
 
 # load our record
-GR19C1 = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv')
+GR19C1 = read.csv('results/RSL/RSLallages_Bchron_EIVIGPinput.csv')
 
 # tidy for plotting
 scale=1.5
@@ -4232,27 +3858,27 @@ terrL$left = terrL$Age-terrL$Age_low_er_2sd # xmin value
 terrL$right = terrL$Age+terrL$Age_up_er_2sd # xmax value
 
 # define factor levels for plotting
-FactorLevels = c('EST-GP','EST-GP Two Components')
+FactorLevels = c('EST-GP Two Components','EST-GP Three Components')
 
-# load original EST-GP outputs
-ESTGP_RSL=read.csv('results/Erica STeHM/Belize/RSL.csv') %>% 
+# load originally submitted 3-component EST-GP outputs
+ESTGP_RSL=read.csv('results/RSLmodels/STeHM model outputs/Belize_ThreeComponents/RSL.csv') %>% 
   filter( model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,
-         model=factor('EST-GP',levels=FactorLevels)) 
-ESTGP_Rates = read.csv('results/Erica STeHM/Belize/RSLrates.csv') %>% 
+         model=factor('EST-GP Three Components',levels=FactorLevels)) 
+ESTGP_Rates = read.csv('results/RSLmodels/STeHM model outputs/Belize_ThreeComponents/RSLrates.csv') %>% 
   filter(model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(df2s=df2s,dsd2s=dsd2s,
-         model=factor('EST-GP',levels=FactorLevels)) 
+         model=factor('EST-GP Three Components',levels=FactorLevels)) 
 
-# load variation of EST-GP: split GR19C1 as separate site
-ESTGP_RSL_TwoComponents=read.csv('results/Erica STeHM/Belize_TwoComponents/RSL.csv') %>% 
+# load two-component EST-GP
+ESTGP_RSL_TwoComponents=read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSL.csv') %>% 
   filter(model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,
          model=factor('EST-GP Two Components',levels=FactorLevels)) 
-ESTGP_Rates_TwoComponents = read.csv('results/Erica STeHM/Belize_TwoComponents/RSLrates.csv') %>% 
+ESTGP_Rates_TwoComponents = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSLrates.csv') %>% 
   filter(model_ranking==0) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(df2s=df2s,dsd2s=dsd2s,
@@ -4304,18 +3930,17 @@ p_local=ggplot()+
 p=cowplot::plot_grid(p_global,p_local,nrow=2,align='hv',rel_heights = c(1,2))
 p
 
-ggsave('Figures/ESTGP_compare_modelstructure_ResponseReviewer3.pdf',p,height=8,width=6)
-
+ggsave('Figures/RSLmodels/ESTGP_compare_modelstructure_ResponseReviewer3.pdf',p,height=8,width=6)
 
 ```
 
 ```{r compare EST-GP two components local signals}
 
-ESTGP_RSL_TwoComponents_local=read.csv('results/Erica STeHM/Belize_TwoComponents/RSL.csv') %>% 
+ESTGP_RSL_TwoComponents_local=read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSL.csv') %>% 
   filter(model_ranking==0 & component==3) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,siteID=as.factor(siteID)) 
-ESTGP_Rates_TwoComponents_local = read.csv('results/Erica STeHM/Belize_TwoComponents/RSLrates.csv') %>% 
+ESTGP_Rates_TwoComponents_local = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSLrates.csv') %>% 
   filter(model_ranking==0 & component==3) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(df2s=df2s,dsd2s=dsd2s,siteID=as.factor(siteID)) 
@@ -4331,17 +3956,17 @@ p=ggplot(data=ESTGP_RSL_TwoComponents_local) +
   labs(x='Age (kyrs BP)')
 p
 
-ggsave('Figures/ESTGP_TwoComponents_Local_ChosenModel_bysite_ResponseReviewer3.pdf',p,height=6,width=8)
+ggsave('Figures/RSLmodels/ESTGP_TwoComponents_Local_ChosenModel_bysite_ResponseReviewer3.pdf',p,height=6,width=8)
 
 ```
 
 ```{r compare EST-GP two components local signals by model ranking}
 
-ESTGP_RSL_TwoComponents_local=read.csv('results/Erica STeHM/Belize_TwoComponents/RSL.csv') %>% 
+ESTGP_RSL_TwoComponents_local=read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSL.csv') %>% 
   filter(component==3) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,siteID=as.factor(siteID),model_ranking=as.factor(model_ranking)) 
-ESTGP_Rates_TwoComponents_local = read.csv('results/Erica STeHM/Belize_TwoComponents/RSLrates.csv') %>% 
+ESTGP_Rates_TwoComponents_local = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/RSLrates.csv') %>% 
   filter(component==3) %>% 
   filter(yearBP<=max(SLIPs$Age)) %>%
   mutate(df2s=df2s,dsd2s=dsd2s,siteID=as.factor(siteID),model_ranking=as.factor(model_ranking)) 
@@ -4371,274 +3996,10 @@ p=ggplot() +
   labs(y='RSL (m)')
 p
 
-ggsave('Figures/ESTGP_TwoComponents_Local_ByModelRanking_ResponseReviewer3.pdf',p,height=6,width=8)
+ggsave('Figures/RSLmodels/ESTGP_TwoComponents_Local_ByModelRanking_ResponseReviewer3.pdf',p,height=6,width=8)
 
 
 ```
-
-```{r check modelled residuals}
-
-# load predicted RSL - full component without noise
-ESTGP_RSL_TwoComponents_check=read.csv('results/Erica STeHM/Belize_TwoComponents/RSL_check.csv') %>% 
-  mutate(siteID=as.factor(siteID)) %>%
-  rename(pred=RSL,pred_sd=RSLsd) %>% 
-  mutate(pred=pred/1000,pred_sd=pred_sd/1000)
-
-# load observations
-BelizeSLIPs = read.csv('data/Belize_6Aug25_extended.csv') %>% filter(Type==0) %>% rename(yearBP=Age)
-
-# join
-ESTGP_RSL_TwoComponents_check = inner_join(ESTGP_RSL_TwoComponents_check,
-                                           BelizeSLIPs,
-                                           by='yearBP') %>% 
-  filter(Site!='Barbados') %>% mutate(residual=pred-RSL)
-
-p_residual = 
-  ggplot(data=ESTGP_RSL_TwoComponents_check) +
-  geom_point(aes(x=yearBP,y=residual)) +
-  theme_classic()+
-  scale_x_reverse()+
-  labs(x='Age (yrs BP)',y='Residual (m)')
-
-p_residual
-
-ggsave('Figures/ESTGP_TwoComponents_ModelResiduals.pdf',p_residual,height=6,width=8)
-
-
-```
-
-
-## Compare EST-GP with PaleoSTeHM (not published, for Yucheng)
-We compare the EST-GP model results to Paleo-STeHM results, to assess if the two models produce similar results.
-
-```{r compare EST-GP to PaleoSTeHM}
-
-# load RSL data
-BelizeDatabase = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),                                        
-                                                                            Quality=as.factor(Quality),
-                                                                                component='Full') %>% mutate(component=factor(component,levels=c('Full','Global','Regional','Local'))) %>% 
-  mutate(Age=Age/1000,Age_up_er_2sd=Age_up_er_2sd/1000,Age_low_er_2sd=Age_low_er_2sd/1000)
-
-# load our record
-GR19C1 = read.csv('results/SLIPs/RSLallages_Bchron_EIVIGPinput.csv') %>% 
-  mutate(Age=Age/1000,Age_up_er_2sd=Age_up_er_2sd/1000,AgeError=AgeError/1000) # change to kyr BP
- 
-# tidy for plotting
-scale=1.5
-
-SLIPs= filter(BelizeDatabase,Type==0)
-SLIPs$upper = SLIPs$RSL + SLIPs$RSL_up_er_2sd # ymax value
-SLIPs$lower = SLIPs$RSL - SLIPs$RSL_low_er_2sd # ymin value
-SLIPs$left = SLIPs$Age - SLIPs$Age_low_er_2sd  # xmin value
-SLIPs$right = SLIPs$Age + SLIPs$Age_up_er_2sd # xmax value
-
-marL=filter(BelizeDatabase,Type==-1)
-marL$upper = marL$RSL - marL$RSL_low_er_2sd # y value of horizontal line
-marL$lower = marL$upper - scale # y value for bottom of tick mark
-marL$xmid = marL$Age
-marL$left = marL$Age-marL$Age_low_er_2sd # xmin value
-marL$right = marL$Age+marL$Age_up_er_2sd # xmax value
-
-terrL=filter(BelizeDatabase,Type==1)
-terrL$lower = terrL$RSL + terrL$RSL_up_er_2sd # y value of horizontal line
-terrL$upper = terrL$lower + scale # y value for top of tick mark
-terrL$xmid = terrL$Age
-terrL$left = terrL$Age-terrL$Age_low_er_2sd # xmin value
-terrL$right = terrL$Age+terrL$Age_up_er_2sd # xmax value
-
-# load Paleo-STeHM results
-PaleoSTeHM_est_decomposed = read.csv('results/PaleoSTeHM model outputs/Belize/RSLest_Belize_bysubregion_Decomposed.csv') %>% mutate(model='PaleoSTeHM') %>% 
-mutate(ageBP=ageBP/1000) %>% # change to kyr BP  
-filter(ageBP<=max(SLIPs$Age)) 
-PaleoSTeHM_rates_decomposed = read.csv('results/PaleoSTeHM model outputs/Belize/RSLrates_Belize_bysubregion_Decomposed.csv') %>% mutate(model='PaleoSTeHM') %>% mutate(ageBP=ageBP/1000) %>% # change to kyr BP
-filter(ageBP<=max(SLIPs$Age)) 
-
-# load EST-GP model (chosen model)
-ESTGP_RSL_chosen=read.csv('results/Erica STeHM/Belize/RSL.csv') %>% 
-  filter(model_ranking==0) %>% 
-  mutate(yearBP=yearBP/1000) %>% # change to kyr
-  filter(yearBP<=max(SLIPs$Age)) %>%
-  mutate(RSL=RSL/1000,RSLsd=RSLsd/1000,model='EST-GP') %>% 
-  mutate(site=paste0('Belize_',siteID))
-ESTGP_Rates_chosen = read.csv('results/Erica STeHM/Belize/RSLrates.csv') %>% 
-  filter(model_ranking==0) %>% 
-  mutate(yearBP=yearBP/1000) %>% # change to kyr
-  filter(yearBP<=max(SLIPs$Age)) %>%
-  mutate(df2s=df2s,dsd2s=dsd2s,model='EST-GP') %>% mutate(site=paste0('Belize_',siteID))
-
-# rename components of EST-GP as text 
-ESTGP_RSL_chosen <- ESTGP_RSL_chosen %>%
-  mutate(component = case_when(
-    component == "1" ~ "Full",
-    component == "2" ~ "Global",
-    component == "3" ~ "Regional",
-    component == "4" ~ "Local")) %>% mutate(component=factor(component,levels=c('Full','Global','Regional','Local')))
-ESTGP_Rates_chosen <- ESTGP_Rates_chosen %>%
-  mutate(component = case_when(
-    component == "1" ~ "Full",
-    component == "2" ~ "Global",
-    component == "3" ~ "Regional",
-    component == "4" ~ "Local")) %>% mutate(component=factor(component,levels=c('Full','Global','Regional','Local')))
-
-p_global_est= ggplot() +
-  # plot existing data
-  geom_rect(data=SLIPs, # recalibrated
-            aes(xmin = left, xmax = right, ymin = lower, ymax = upper,
-                linetype=Quality,alpha=Quality),
-            linewidth=0.4,fill='#bf812d',color='#bf812d')+
-  geom_segment(data=terrL, # horizontal line
-               mapping = aes(x=left,xend=right,y=lower,yend=lower,alpha=Quality,linetype=Quality),
-               color='forestgreen',linewidth=0.4) +
-  geom_segment(data=terrL, # vertical tick mark
-               mapping = aes(x=xmid,xend=xmid,y=lower,yend=upper,alpha=Quality,linetype=Quality),
-               color='forestgreen',linewidth=0.4) +
-  geom_segment(data=marL, # horizontal line
-               mapping = aes(x=left,xend=right,y=upper,yend=upper,alpha=Quality,linetype=Quality),
-               color='blue',linewidth=0.4)+
-  geom_segment(data=marL, # vertical tick mark
-               mapping = aes(x=xmid,xend=xmid,y=lower,yend=upper,alpha=Quality,linetype=Quality),
-               color='blue',linewidth=0.4)+
-  # plot our record
-  geom_rect(data=GR19C1,aes(xmin=Age-Age_up_er_2sd,
-                xmax=Age+Age_up_er_2sd,
-                ymin=RSL-RSLer_up_2sd,
-                ymax=RSL+RSLer_up_2sd),alpha=0.8,fill=NA,linewidth=0.3,color='black') +
-  # plot EST-GP
-  geom_path(data=filter(ESTGP_RSL_chosen,component=='Global'),
-            aes(x=yearBP,y=RSL,color=model))+
-  geom_ribbon(data=filter(ESTGP_RSL_chosen,component=='Global'),
-              aes(x=yearBP,ymin=RSL-2*RSLsd,ymax=RSL+2*RSLsd,fill=model),alpha=0.5)+
-  # plot PaleoSTeHM
-  geom_path(data=filter(PaleoSTeHM_est_decomposed,component=='Global'),
-            aes(x=ageBP,y=RSL_mean,color=model)) +
-  geom_ribbon(data=filter(PaleoSTeHM_est_decomposed,component=='Global'),
-            aes(x=ageBP,ymin=RSL_mean-2*RSL_std,ymax=RSL_mean+2*RSL_std,fill=model),alpha=0.5) +
-  scale_x_reverse(breaks=seq(0,13,1),
-                  limits=c(13.5,-0.1))+
-  scale_color_hawaii(discrete=TRUE) + 
-  scale_fill_hawaii(discrete = TRUE) +
-  scale_alpha_manual(values=c(0.5,0.1))+
-  labs(x='Age (yrs BP)',y='RSL (m)')+
-  theme_classic()+
-  theme(legend.position = 'top') + 
-  ggtitle('Global component')
-  
-p_global_rates = ggplot() +
-  # plot EST-GP
-  geom_path(data=filter(ESTGP_Rates_chosen,component=='Global'),
-            aes(x=yearBP,y=df2s,color=model))+
-  geom_ribbon(data=filter(ESTGP_Rates_chosen,component=='Global'),
-              aes(x=yearBP,ymin=df2s-2*dsd2s,ymax=df2s+2*dsd2s,fill=model),alpha=0.5)+
-  # plot PaleoSTeHM
-  geom_path(data=filter(PaleoSTeHM_rates_decomposed,component=='Global'),
-            aes(x=ageBP,y=Rate_mean,color=model)) +
-  geom_ribbon(data=filter(PaleoSTeHM_rates_decomposed,component=='Global'),
-            aes(x=ageBP,ymin=Rate_mean-2*Rate_sd,ymax=Rate_mean+2*Rate_sd,fill=model),alpha=0.5) +
-  scale_x_reverse(breaks=seq(0,13,1),
-                  limits=c(13.5,-0.1))+
-  scale_color_hawaii(discrete=TRUE) + 
-  scale_fill_hawaii(discrete = TRUE) +
-  theme_classic()+
-  theme(legend.position = 'top') +
-  labs(x='Age (BP)',y='RSL (m)') +
-  ggtitle('Global component')
-
-p_regional_est = ggplot() +
-  # plot EST-GP results
-  geom_path(data=filter(ESTGP_RSL_chosen,component=='Regional'),
-            aes(x=yearBP,y=RSL,color=model)) +
-  geom_ribbon(data=filter(ESTGP_RSL_chosen,component=='Regional'),
-            aes(x=yearBP,ymin=RSL-2*RSLsd,ymax=RSL+2*RSLsd,fill=model),alpha=0.5) +
-  # plot PaleoSTeHM results
-  geom_path(data=filter(PaleoSTeHM_est_decomposed,component=='Regional'),
-            aes(x=ageBP,y=RSL_mean,color=model))+
-  geom_ribbon(data=filter(PaleoSTeHM_est_decomposed,component=='Regional'),
-            aes(x=ageBP,ymin=RSL_mean-2*RSL_std,ymax=RSL_mean+2*RSL_std,fill=model),alpha=0.5)+
-  facet_wrap(~site,nrow=2) +
-  theme_classic() +
-  theme(legend.position='top')+
-  scale_x_reverse(breaks=seq(0,13,1),
-                  limits=c(13.5,-0.1))+
-  scale_color_hawaii(discrete=TRUE) + 
-  scale_fill_hawaii(discrete = TRUE) +
-  labs(x='Age (BP)',y='Regional RSL (m)') +
-  ggtitle('Regional component')
-
-p_regional_rates = ggplot() +
-  # plot EST-GP results
-  geom_path(data=filter(ESTGP_Rates_chosen,component=='Regional'),
-            aes(x=yearBP,y=df2s,color=model)) +
-  geom_ribbon(data=filter(ESTGP_Rates_chosen,component=='Regional'),
-            aes(x=yearBP,ymin=df2s-2*dsd2s,ymax=df2s+2*dsd2s,fill=model),alpha=0.5) +
-  # plot PaleoSTeHM results
-  geom_path(data=filter(PaleoSTeHM_rates_decomposed,component=='Regional'),
-            aes(x=ageBP,y=Rate_mean,color=model))+
-  geom_ribbon(data=filter(PaleoSTeHM_rates_decomposed,component=='Regional'),
-            aes(x=ageBP,ymin=Rate_mean-2*Rate_sd,ymax=Rate_mean+2*Rate_sd,fill=model),alpha=0.5)+
-  facet_wrap(~site,nrow=2) +
-  theme_classic() +
-  theme(legend.position='none')+
-  scale_x_reverse(breaks=seq(0,13,1),
-                  limits=c(13.5,-0.1))+
-  scale_color_hawaii(discrete=TRUE) + 
-  scale_fill_hawaii(discrete = TRUE) +
-  labs(x='Age (BP)',y='Regional RSL (m)') +
-  ggtitle('Regional component')
-
-p_local_est = ggplot() +
-  # plot EST-GP results
-  geom_path(data=filter(ESTGP_RSL_chosen,component=='Local'),
-            aes(x=yearBP,y=RSL,color=model)) +
-  geom_ribbon(data=filter(ESTGP_RSL_chosen,component=='Local'),
-            aes(x=yearBP,ymin=RSL-2*RSLsd,ymax=RSL+2*RSLsd,fill=model),alpha=0.5) +
-  # plot PaleoSTeHM results
-  geom_path(data=filter(PaleoSTeHM_est_decomposed,component=='Local'),
-            aes(x=ageBP,y=RSL_mean,color=model))+
-  geom_ribbon(data=filter(PaleoSTeHM_est_decomposed,component=='Local'),
-            aes(x=ageBP,ymin=RSL_mean-2*RSL_std,ymax=RSL_mean+2*RSL_std,fill=model),alpha=0.5)+
-  facet_wrap(~site,nrow=2) +
-  theme_classic() +
-  theme(legend.position='none')+
-  scale_x_reverse(breaks=seq(0,13,1),
-                  limits=c(13.5,-0.1))+
-  scale_color_hawaii(discrete=TRUE) + 
-  scale_fill_hawaii(discrete = TRUE) +
-  labs(x='Age (BP)',y='Local RSL (m)') +
-  ggtitle('Local component')
-
-p_local_rates = ggplot() +
-  # plot EST-GP results
-  geom_path(data=filter(ESTGP_Rates_chosen,component=='Local'),
-            aes(x=yearBP,y=df2s,color=model)) +
-  geom_ribbon(data=filter(ESTGP_Rates_chosen,component=='Local'),
-            aes(x=yearBP,ymin=df2s-2*dsd2s,ymax=df2s+2*dsd2s,fill=model),alpha=0.5) +
-  # plot PaleoSTeHM results
-  geom_path(data=filter(PaleoSTeHM_rates_decomposed,component=='Local'),
-            aes(x=ageBP,y=Rate_mean,color=model))+
-  geom_ribbon(data=filter(PaleoSTeHM_rates_decomposed,component=='Local'),
-            aes(x=ageBP,ymin=Rate_mean-2*Rate_sd,ymax=Rate_mean+2*Rate_sd,fill=model),alpha=0.5)+
-  facet_wrap(~site,nrow=2) +
-  theme_classic() +
-  theme(legend.position='none')+
-  scale_x_reverse(breaks=seq(0,13,1),
-                  limits=c(13.5,-0.1))+
-  scale_color_hawaii(discrete=TRUE) + 
-  scale_fill_hawaii(discrete = TRUE) +
-  labs(x='Age (BP)',y='Regional RSL (m)') +
-  ggtitle('Regional component')
-
-p_compareest = cowplot::plot_grid(p_global_est,p_regional_est,p_local_est,nrow=3,align='hv',axis='tblr')
-p_compareest
-
-p_comparerates = cowplot::plot_grid(p_global_rates,p_regional_rates,p_local_rates,nrow=3,align='hv',axis='tblr')
-p_comparerates
-
-ggsave('figures/compare_ESTGP_PaleoSTeHM_est.pdf',p_compareest,height=8,width=8)
-ggsave('figures/compare_ESTGP_PaleoSTeHM_rates.pdf',p_comparerates,height=8,width=8)
-
-```
-
-
 
 # Comparison with IPCC AR6 projections
 
