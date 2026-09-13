@@ -31,7 +31,8 @@ library(hdrcde) # to compute highest density region
 library(ggridges)
 library(Bchron)
 library(khroma)
-
+library(ncdf4)
+library(sf)
 ```
 
 # Core elevation
@@ -4065,31 +4066,50 @@ extractIPCC2030Rate = function(y){
 lapply(X=filelist,FUN=extractIPCC2030Rate)
 ```
 
-```{r 2050 2100 2150 exceedance probability }
+```{r 2100 exceedance probability }
 
-prob_exceed_2050 = IPCCAR6rates %>% mutate(quantile=as.numeric(quantile)) %>% filter(year==2050)
-prob_exceed_2050 = slice(prob_exceed_2050,which(grepl('low_confidence',prob_exceed_2050$scenario)==FALSE))
+# function to extract rates for Belize from IPCC AR6 netCDF files
+loadIPCCAR6rate = function(x) {
+  
+  # open file
+  filepath=paste0('data/IPCC AR6/regional_rates/raw/',x)
+  nc = nc_open(filepath)
+  
+  # load dimensions
+  locations = ncvar_get(nc,"locations")
+  years = ncvar_get(nc,"years")
+  quantiles = ncvar_get(nc,"quantiles")
+
+  # find Belize ID 
+  lat = ncvar_get(nc,"lat")
+  lon =  ncvar_get(nc,"lon")
+  BelizeID = which(lat==17 & lon==-88)
+  
+  # load variables
+  rate = ncvar_get(nc,"sea_level_change_rate")[BelizeID,,] # locations, years, quantiles
+  
+  # close netcdf file
+  nc_close(nc)
+  
+  # tidy data 
+  rate_tidy = as.data.frame(rate)
+  colnames(rate_tidy) = quantiles
+  rate_tidy = rate_tidy %>% 
+    mutate(year=years,scenario=substr(x,7,nchar(x)-9)) %>%
+    pivot_longer(names_to='quantile',values_to='rate',cols=-c(year,scenario))
+  
+  return(rate_tidy)
+  
+}
+
+# Load all different scenario files
+filelist = as.list(list.files('data/IPCC AR6/regional_rates/raw/')) 
+IPCCAR6rates = lapply(filelist,loadIPCCAR6rate) %>% rbindlist()
+
 prob_exceed_2100 = IPCCAR6rates %>% mutate(quantile=as.numeric(quantile)) %>% filter(year==2100)
 prob_exceed_2100 = slice(prob_exceed_2100,which(grepl('low_confidence',prob_exceed_2100$scenario)==FALSE))
-prob_exceed_2150 = IPCCAR6rates %>% mutate(quantile=as.numeric(quantile)) %>% filter(year==2150)
-prob_exceed_2150 = slice(prob_exceed_2150,which(grepl('low_confidence',prob_exceed_2150$scenario)==FALSE))
 
-
-p1 = ggplot() +
-  geom_path(data=prob_exceed_2050,aes(y=1-quantile,x=rate,color=scenario)) +
-  geom_rect(aes(xmin=4.8,xmax=7.6,ymin=0,ymax=1),alpha=0.2)+
-  geom_vline(aes(xintercept=6.2),color='black')+
-  geom_hline(aes(yintercept=0.33),linetype='dashed')+
-  geom_hline(aes(yintercept=0.66),linetype='dashed')+
-  geom_hline(aes(yintercept=0.90),linetype='dashed')+
-  scale_color_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_x_continuous(limits=c(min(prob_exceed_2050$rate,prob_exceed_2100$rate),max(prob_exceed_2050$rate,prob_exceed_2100$rate))) +
-  theme_classic() +
-  labs(x='Rate (mm/yr)',y='Probability') +
-  ggtitle('Projected rates in 2050')
-
-
-p2 = ggplot() +
+p=ggplot() +
   geom_path(data=prob_exceed_2100,aes(y=1-quantile,x=rate,color=scenario)) +
   geom_rect(aes(xmin=4.8,xmax=7.6,ymin=0,ymax=1),alpha=0.2)+
   geom_vline(aes(xintercept=6.2),color='black')+
@@ -4102,23 +4122,9 @@ p2 = ggplot() +
   labs(x='Rate (mm/yr)',y='Probability') +
   ggtitle('Projected rates in 2100')
 
-p3 = ggplot() +
-  geom_path(data=prob_exceed_2150,aes(y=1-quantile,x=rate,color=scenario)) +
-  geom_rect(aes(xmin=4.8,xmax=7.6,ymin=0,ymax=1),alpha=0.2)+
-  geom_vline(aes(xintercept=6.2),color='black')+
-  geom_hline(aes(yintercept=0.33),linetype='dashed')+
-  geom_hline(aes(yintercept=0.66),linetype='dashed')+
-  geom_hline(aes(yintercept=0.90),linetype='dashed')+
-  scale_color_hawaii(discrete=TRUE,reverse=TRUE,scale_name='hawaii')+
-  scale_x_continuous(limits=c(min(prob_exceed_2050$rate,prob_exceed_2100$rate),max(prob_exceed_2050$rate,prob_exceed_2100$rate))) +
-  theme_classic() +
-  labs(x='Rate (mm/yr)',y='Probability') +
-  ggtitle('Projected rates in 2150')
-
-p=cowplot::plot_grid(p1,p2,p3,nrow=3,align='hv')
 p
 
-ggsave('figures/IPCC AR6 projections rate CDF Belize inverted.pdf',p,height=7,width=6)
+ggsave('figures/IPCC AR6/IPCC AR6 2100 projected rates CDF Belize.pdf',p,height=3,width=6)
 
 ```
 
@@ -4176,27 +4182,7 @@ p_IPCC = cowplot::plot_grid(p_RSL_med,p_rates_med,nrow=1,align='hv')
 p_IPCC
 
 
-ggplot() +
-  # plot medium confidence median projections
-  geom_path(data=filter(IPCCAR6_rates,confidence=='medium'), aes(x=year,y=`50`,color=scenario_confidence,group=scenario_confidence)) +
-  # plot medium confidence likely range (17-83rd percentile) 
-  geom_ribbon(data=filter(IPCCAR6_rates,confidence=='medium'),aes(x=year,ymin=`17`,ymax=`83`,fill=scenario_confidence,group=scenario_confidence),alpha=0.25) +
-  geom_vline(aes(xintercept=2040),linetype='dashed',color='grey80',linewidth=0.3)+
-  geom_vline(aes(xintercept=2060),linetype='dashed',color='grey80',linewidth=0.3)+
-  geom_vline(aes(xintercept=2080),linetype='dashed',color='grey80',linewidth=0.3)+
-  geom_vline(aes(xintercept=2100),linetype='dashed',color='grey80',linewidth=0.3)+
-  geom_vline(aes(xintercept=2120),linetype='dashed',color='grey80',linewidth=0.3)+
-  geom_vline(aes(xintercept=2140),linetype='dashed',color='grey80',linewidth=0.3)+
-  geom_hline(aes(yintercept=4.8),color='yellow',size=0.5)+
-  geom_hline(aes(yintercept=6.2),color='yellow',size=0.5)+
-  geom_hline(aes(yintercept=7.6),color='yellow',size=0.5)+
-  theme_classic() +
-  scale_x_continuous(breaks=seq(from=2040,to=2150,by=20),limits=c(2030,2150))+
-  scale_color_batlow(discrete =TRUE,reverse=FALSE,scale_name='batlow')+
-  scale_fill_batlow(discrete =TRUE,reverse=FALSE,scale_name='batlow') +
-  labs(y='RSL rate (mm/yr)',x='Year') 
-
-ggsave('figures/IPCC AR6 projections Belize.pdf',p_IPCC,height=3,width=11)
+ggsave('figures/IPCC AR6/IPCC AR6 projections Belize.pdf',p_IPCC,height=3,width=11)
  paste('Median projections of RSL rise rates exceed',min(IPCCAR6$`50`),'mm/yr under all SSP scenarios.')
 
 ```
@@ -4210,10 +4196,10 @@ IPCCAR6_rates_2100_ssp119 = readxl::read_xlsx('data/IPCC AR6/ipcc_ar6_sea_level_
 paste('Under SSP1-1.9, the median rate is',IPCCAR6_rates_2100_ssp119$`50`,'mm/yr.')
 
 # load global rate simulated samples (optimal model ensemble only)
-ESTGP_Rates_global_samples = read.csv('results/Erica STeHM/Belize_TwoComponents/GlobalRates_samples.csv') %>% filter(model_ranking!=2)
+ESTGP_Rates_global_samples = read.csv('results/RSLmodels/STeHM model outputs/Belize_TwoComponents/GlobalRates_samples.csv') %>% filter(model_ranking!=2)
 
 # cut to time span of Belize SLIPs
-BelizeSLIPs = readxl::read_xlsx('data/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality)) %>% filter(Type==0)
+BelizeSLIPs = readxl::read_xlsx('data/RSLdatabase/BelizeDatabase_6Aug2025.xlsx') %>% mutate(Tectonic=as.factor(Tectonic),Quality=as.factor(Quality)) %>% filter(Type==0)
 ESTGP_Rates_global_samples = filter(ESTGP_Rates_global_samples, yearBP <= max(BelizeSLIPs$Age))
 
 # visualise distributions
@@ -4264,7 +4250,7 @@ p2 =
 p=cowplot::plot_grid(p1,p2,nrow=2,align='hv')
 p
 # ggsave('figures/ExceedanceProb_Rates_8mmyr_threshold.pdf',p,height=6,width=5)
-ggsave('figures/ExceedanceProb_Rates_SSP1-19_threshold.pdf',p,height=6,width=5)
+ggsave('figures/IPCC AR6/ExceedanceProb_Rates_SSP1-19_threshold.pdf',p,height=6,width=5)
 
 verylikelyrateprob = filter(rate_prob,prob>=0.9) %>% group_by(quantile) %>% summarise(minyear=min(yearBP))
 # paste('Rates of RSL rise >= 8mm/yr have very likely (>90% probability) not been observed since at least',round(min(verylikelyrateprob$yearBP)/1000,digits=1),'kyrs BP.')
@@ -4276,7 +4262,6 @@ paste('Rates of RSL rise >= SSP1-1.9 have very likely (>90% probability) not bee
 
 # produce for all medium confidence projections only
 filelist=as.list(list.files('data/IPCC AR6/regional_rates/raw/')[which(grepl('low',list.files('data/IPCC AR6/regional_rates/raw/'))==FALSE)])
-
 
 # function to extract rates for each medium confidence projection in 2030
 extractIPCCRates = function(y){
