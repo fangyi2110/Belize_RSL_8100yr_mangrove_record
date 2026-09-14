@@ -17,7 +17,7 @@ Belize_RSL_R.Rproj/
 │   └── LICENSE/
 │   └── README.md/
 │
-├── python/
+├── R_reslr/
 │   ├── scripts/
 │   └── data/
 │
