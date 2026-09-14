@@ -9,9 +9,13 @@ Belize_RSL_R.Rproj/
 │   └── figures/
 │   └── results/
 │
-├── Matlab_STeHM/
-│   ├── scripts/
-│   └── data/
+├── Matlab_ESTGP/
+│   ├── runESTGP_Belize_extended_propagatemodelselection_allmodels_TwoComponents.m/
+│   └── IFILES/
+│   └── MFILES/
+│   └── Belize_EST_GP_extended_modelensemble_modeofallmodels_TwoComponents/
+│   └── LICENSE/
+│   └── README.md/
 │
 ├── python/
 │   ├── scripts/
@@ -24,7 +28,7 @@ Belize_RSL_R.Rproj/
 ## Description
 
 - **[R Reconstruction](ca://s?q=R_Reconstruction_folder_usage)**: Contains the main manuscript (`Belize RSL Manuscript.Rmd`) and supporting data, figures, and results.
-- **[MATLAB](ca://s?q=MATLAB_scripts_and_data)**: Scripts and datasets for MATLAB-based analyses.
+- **[MATLAB](ca://s?q=MATLAB_scripts_and_data)**: Scripts and datasets for running the spatiotemporal empirical hierarchical Gaussian Process model (EST-GP) (Ashe et al., 2019).
 - **[Python](ca://s?q=Python_scripts_and_data)**: Scripts and datasets for Python-based analyses.
 - **[README.md](ca://s?q=Documentation_folder_structure)**: This README file explaining folder and file structures.
 ---
