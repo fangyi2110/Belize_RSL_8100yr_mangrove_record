@@ -4308,22 +4308,12 @@ lapply(X=filelist,FUN=extractIPCCRates)
 
 # Geochemistry
 
-Our modern samples show that d15N and d13C results vary with sub-environments, rather than the location of the study site. 
-
-- In general, d13C values are within the same range as those reported for Puerto Rico mangroves (Khan et al., 2019), but are more depleted than reported in earlier study at Twin Cay (Wooller et al., 2003).
-
-- More positive d13C values are seen in samples near the edge of the mangrove/ boundary of peat collapse, possibly reflecting some input of marine detritus or microbial mat (algae/ seagrass) (Wooller et al., 2003; Khan et al., 2019). 
-
-- However, we do not see strongly enriched d13C (-16 to -20) like that observed in areas with substantial microbial mat (Wooller et al., 2003)
-
-- Basin Rhizophora are more depleted in d15N than fringe Rhizophora. Fringe Rhizophora are N limited, therefore they have higher d15N as they try to maximise all sources of N (McKee et al., 2002). Additionally, d15N may be enriched in fringe zones due to microbial fractionation from nitrification-denitrification, as the soil is intermittently flooded and drained with the tides (McKee et al., 2002). This may explain why the dwarf tree at the channel side had enriched d15N. In contrast, dwarf trees in the island interior (basin Rhizophora) are Phosphorus limited, and their lower d15N values may be related to their slow growth and low demand for N (McKee et al., 2002).
-
 ## Modern samples 
 
 ```{r geochemistry modern samples}
 
 # load modern CN results
-CNmodern = readxl::read_xlsx('data/CN results/CN_geochem_modernsamples_HKU.xlsx',sheet=1) %>% 
+CNmodern = readxl::read_xlsx('data/geochemistry/CN results/CN_geochem_modernsamples_HKU.xlsx',sheet=1) %>% 
 mutate(subenvironment = factor(subenvironment, 
                                levels=c('dwarf mangroves (basin)',
                                         'dwarf mangroves (channel side)',
@@ -4351,26 +4341,20 @@ p_modernCN = cowplot::plot_grid(plotd13C_d15N,plotd13C_CN,nrow=2,align='hv')
 
 p_modernCN
 
-ggsave('figures/modern CN distribution.pdf',p_modernCN,height=6,width=7)
+ggsave('figures/geochemistry/modern CN distribution.pdf',p_modernCN,height=6,width=7)
 
 ```
 
 ## GR/19/C1 core
 
-The d13C values in our core fall within uncertainty of the present-day values of mangrove sediments from our modern survey.
-
-The depletion of d13C (shift to more negative values) and slight enrichment in d15N towards the base of the core is consistent with decomposition (loss of non-lignin organic matter) (Wooller et al., 2003). 
-
-While the depleted d13C values may also be explained by the presence of dwarf mangroves or black mangroves at the site earlier on, this theory is inconsistent with the positive d15N observed near the base of the core. 
-
 ```{r geochemistry core}
 
 # load CN geochem results for core 
-CN=readxl::read_xlsx('data/CN results/CN_geochem_results.xlsx') %>% mutate(dataset='2025')
+CN=readxl::read_xlsx('data/geochemistry/CN results/CN_geochem_results.xlsx') %>% mutate(dataset='2025')
 CN = CN %>% mutate(elev_msl = GR19C1_coretop_MSL-depth_cm/100) # create elevation column
 
 # load modern CN results
-CNmodern = readxl::read_xlsx('data/CN results/CN_geochem_modernsamples_HKU.xlsx',sheet=1)  %>% filter(subenvironment != 'carbonate sand' & subenvironment != 'boundary of peat collapse (channel side)')
+CNmodern = readxl::read_xlsx('data/geochemistry/CN results/CN_geochem_modernsamples_HKU.xlsx',sheet=1)  %>% filter(subenvironment != 'carbonate sand' & subenvironment != 'boundary of peat collapse (channel side)')
 
 # stratigraphy
 p_strat=ggplot() + 
@@ -4459,87 +4443,6 @@ plot=cowplot::plot_grid(p_strat,p_d13C,p_d15N,p_CN,
                    rel_widths = c(0.5,1,1,0.8 ))
 plot
 
-ggsave('figures/CN depth.pdf',plot,width=8,height=6)
+ggsave('figures/geochemistry/CN depth.pdf',plot,width=8,height=6)
 ```
 
-```{r geochemistry time series}
-
-# load age-depth model results 
-load('results/age-depth model outputs/age-depth_alldata.Rdata')
-
-# load CN geochem results for core 
-CN=readxl::read_xlsx('data/CN results/CN_geochem_results.xlsx') %>% mutate(dataset='2025')
-CN = CN %>% mutate(elev_msl = GR19C1_coretop_MSL-depth_cm/100) # create elevation column
-
-# predict ages at LOI depths
-CNages = predict(age_depth,
-                  newPositions = CN$depth_cm)
-
-# mean predicted age at all CN depths
-calcMeanAge = function(x) {
-  ages=CNages[,x]
-  meanage=mean(ages)
-  return(meanage)
-}
-
-# sd predicted age at all CN depths
-calcSdAge = function(x) {
-  ages=CNages[,x]
-  meanage=sd(ages)
-  return(meanage)
-}
-
-toapply=array(1:ncol(CNages))
-
-CNmeanages = apply(X=toapply,MARGIN=1,FUN=calcMeanAge)
-CNsdages=apply(X=toapply,MARGIN=1,FUN=calcSdAge)
-CN=mutate(CN,age=CNmeanages,sd_age=CNsdages)
-
-pd13C_time = 
-  ggplot(data=CN,
-               aes(y=d13C,
-                x=age)) +
-  geom_point() +
-  geom_line() +
-  theme_classic() +
-  scale_x_reverse()+
-  theme(axis.text=element_text(size=15),
-        axis.title.x=element_text(size=15,face='bold'),
-        axis.title.y=element_text(size=15,face='bold')) +
-  labs(x='Age (cal yrs BP)',y='d13C')
-
-pd15N_time = 
-  ggplot(data=CN,
-               aes(y=d15N,
-                x=age)) +
-  geom_point() +
-  geom_line() +
-  theme_classic() +
-  scale_x_reverse()+
-  theme(axis.text=element_text(size=15),
-        axis.title.x=element_text(size=15,face='bold'),
-        axis.title.y=element_text(size=15,face='bold')) +
-  labs(x='Age (cal yrs BP)',y='d15N')
-
-pCN_time = 
-  ggplot(data=CN,
-               aes(y=CN,
-                x=age)) +
-  geom_point() +
-  geom_line() +
-  theme_classic() +
-  scale_x_reverse()+
-  theme(axis.text=element_text(size=15),
-        axis.title.x=element_text(size=15,face='bold'),
-        axis.title.y=element_text(size=15,face='bold')) +
-  labs(x='Age (cal yrs BP)',y='C/N')
-
-CN_time=cowplot::plot_grid(pd13C_time,pd15N_time,pCN_time,
-                   nrow=3,
-                   align='h')
-CN_time
-
-ggsave('figures/CN timeseries.pdf',CN_time,width=6,height=8)
-
-
-```
