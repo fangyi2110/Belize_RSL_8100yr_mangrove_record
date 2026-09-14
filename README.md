@@ -9,7 +9,7 @@ Belize_RSL_R.Rproj/
 │   └── figures/
 │   └── results/
 │
-├── matlab/
+├── Matlab_STeHM/
 │   ├── scripts/
 │   └── data/
 │
